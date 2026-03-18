@@ -51,19 +51,12 @@ jobs:
           node-version: '22'
           cache: npm
           cache-dependency-path: web/package-lock.json
-      # Project site: /repo/  |  User site (repo named user.github.io): /
+      # Relative base (./) so JS + league-data load even if URL casing/path differs
       - name: Install & build
         working-directory: web
         run: |
-          REPO_LOWER=$(echo '${{ github.event.repository.name }}' | tr '[:upper:]' '[:lower:]')
-          if [[ "$REPO_LOWER" == *.github.io ]]; then
-            export VITE_BASE_PATH="/"
-            echo "User/Org Pages repo → site at root"
-          else
-            export VITE_BASE_PATH="/${REPO_LOWER}/"
-            echo "Project Pages → site at ${VITE_BASE_PATH}"
-          fi
-          echo "VITE_BASE_PATH=$VITE_BASE_PATH"
+          export VITE_BASE_PATH="./"
+          echo "VITE_BASE_PATH=$VITE_BASE_PATH (relative — use URL with trailing slash: …/repo-name/)"
           npm ci
           npm run build
       - name: Verify league data shipped

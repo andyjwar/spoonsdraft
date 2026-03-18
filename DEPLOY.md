@@ -81,7 +81,7 @@ In **Actions → latest run → build job log**, look for:
 
 | Symptom | Cause |
 |--------|--------|
+| **Totally blank / white page** | Wrong URL or **missing trailing slash**. Use **Settings → Pages** “Visit site” link. Must look like `https://USER.github.io/REPO/` (**slash at the end**). |
 | Demo league / yellow banner | No `FPL_LEAGUE_ID` and no real committed `league-data` |
 | Wrong league | Wrong ID in secret |
 | Letter avatars only | `team-logos/*.png` not committed |
-| Blank / broken site | Open site at correct URL: `…github.io/repo-name/` (often lowercase) |
