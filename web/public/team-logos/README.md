@@ -33,3 +33,16 @@
 Logos are circular on the site (`object-fit: cover`).
 
 **Sharp display:** `npm run dev` / `npm run build` auto-generates **`web/public/team-logos-web/{id}.png`** (192×192) from your uploads so the site isn’t shrinking huge phone photos in the browser (that looks blurry). Re-run dev after adding or changing a logo.
+
+## GitHub Pages (live site)
+
+Logos stay **only on your machine** until you **commit and push** them:
+
+```bash
+cd /path/to/TCLOT
+git add web/public/team-logos/
+git commit -m "Team logos"
+git push
+```
+
+GitHub Actions rebuilds **`team-logos-web`** from those files on deploy. Include **`manifest.json`** here if you use custom filenames (Option B).
