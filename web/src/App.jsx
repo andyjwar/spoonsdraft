@@ -233,6 +233,14 @@ function App() {
     }
   }, [filteredWaiverOutRows, waiverOutTeamFilter, waiverGwTableMode])
 
+  const rankByEntryId = useMemo(() => {
+    const m = new Map()
+    for (const row of data?.tableRows ?? []) {
+      m.set(row.league_entry, row.rank)
+    }
+    return m
+  }, [data?.tableRows])
+
   if (loading) {
     return (
       <div className="app fotmob">
@@ -297,14 +305,6 @@ function App() {
   /** Live tab: default GW when `liveGw` unset; never pass NaN to FPL fetches. */
   const liveGameweek =
     Number(liveGw ?? previousGameweek ?? nextEvent ?? 1) || 1
-
-  const rankByEntryId = useMemo(() => {
-    const m = new Map()
-    for (const row of tableRows || []) {
-      m.set(row.league_entry, row.rank)
-    }
-    return m
-  }, [tableRows])
 
   const renderGwFixture = (fx, i) => {
     const homeRank = rankByEntryId.get(fx.homeId)
