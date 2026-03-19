@@ -6,6 +6,7 @@ import {
 } from './useLeagueData'
 import { TeamAvatar } from './TeamAvatar'
 import { LiveScores } from './LiveScores'
+import { PlayOffBracket } from './PlayOffBracket'
 import './App.css'
 
 const LEAGUE_TITLE = 'The Mostly Ex-FOS Championship'
@@ -174,7 +175,7 @@ function App() {
   const [waiverOutTeamFilter, setWaiverOutTeamFilter] = useState('all')
   const [waiverOutGwFilter, setWaiverOutGwFilter] = useState('all')
   const [waiverGwTableMode, setWaiverGwTableMode] = useState('out')
-  const [dashboardView, setDashboardView] = useState('standings') // standings | waivers | trades | live
+  const [dashboardView, setDashboardView] = useState('standings') // standings | playoff | waivers | trades | live
   const [liveGw, setLiveGw] = useState(null)
 
   const waiverOutTeamOptions = useMemo(() => {
@@ -357,7 +358,24 @@ function App() {
             onClick={() => setDashboardView('standings')}
             aria-current={dashboardView === 'standings' ? 'page' : undefined}
           >
-            Standings &amp; Form
+            <span className="dashboard-nav__emoji" aria-hidden="true">
+              📈
+            </span>
+            <span className="dashboard-nav__label">Standings &amp; Form</span>
+          </button>
+          <button
+            type="button"
+            className={
+              'dashboard-nav__btn' +
+              (dashboardView === 'playoff' ? ' dashboard-nav__btn--active' : '')
+            }
+            onClick={() => setDashboardView('playoff')}
+            aria-current={dashboardView === 'playoff' ? 'page' : undefined}
+          >
+            <span className="dashboard-nav__emoji" aria-hidden="true">
+              🏆
+            </span>
+            <span className="dashboard-nav__label">Play Off</span>
           </button>
           <button
             type="button"
@@ -368,7 +386,10 @@ function App() {
             onClick={() => setDashboardView('waivers')}
             aria-current={dashboardView === 'waivers' ? 'page' : undefined}
           >
-            Waivers
+            <span className="dashboard-nav__emoji" aria-hidden="true">
+              🏃
+            </span>
+            <span className="dashboard-nav__label">Waivers</span>
           </button>
           <button
             type="button"
@@ -379,7 +400,10 @@ function App() {
             onClick={() => setDashboardView('trades')}
             aria-current={dashboardView === 'trades' ? 'page' : undefined}
           >
-            Trades
+            <span className="dashboard-nav__emoji" aria-hidden="true">
+              🤝
+            </span>
+            <span className="dashboard-nav__label">Trades</span>
           </button>
           <button
             type="button"
@@ -390,7 +414,10 @@ function App() {
             onClick={() => setDashboardView('live')}
             aria-current={dashboardView === 'live' ? 'page' : undefined}
           >
-            Live
+            <span className="dashboard-nav__emoji" aria-hidden="true">
+              ⚽
+            </span>
+            <span className="dashboard-nav__label">Live Scoring</span>
           </button>
         </nav>
         <div className="dashboard-content">
@@ -1109,6 +1136,12 @@ function App() {
             </div>
           )}
 
+          {dashboardView === 'playoff' && (
+            <div className="dashboard-stack">
+              <PlayOffBracket tableRows={tableRows} teamLogoMap={teamLogoMap} />
+            </div>
+          )}
+
           {dashboardView === 'trades' && (
             <div className="dashboard-stack">
               <section className="tile tile--compact" aria-labelledby="trades-heading">
@@ -1163,7 +1196,7 @@ function App() {
             <a href="https://draft.premierleague.com" target="_blank" rel="noopener noreferrer">
               draft.premierleague.com
             </a>{' '}
-            (refresh with <code>ingest.py</code>). <strong>Live</strong> tab loads picks &amp; scores
+            (refresh with <code>ingest.py</code>). <strong>Live Scoring</strong> tab loads picks &amp; scores
             via your proxy from the draft FPL APIs in your browser.
           </footer>
         </div>
