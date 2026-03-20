@@ -36,6 +36,7 @@ function PicksTable({ rows }) {
           <col className="live-picks-col-player" />
           <col className="live-picks-col-pos" />
           <col className="live-picks-col-num" />
+          <col className="live-picks-col-alarm" />
           <col className="live-picks-col-num live-picks-col-pts" />
           <col className="live-picks-col-num" />
         </colgroup>
@@ -50,6 +51,12 @@ function PicksTable({ rows }) {
             <th scope="col" className="live-picks-col-num" title="Minutes">
               Mins
             </th>
+            <th
+              scope="col"
+              className="live-picks-col-alarm live-picks-col-alarm--head"
+              aria-label="Defensive contribution"
+              title="Shows when FPL awards exactly 2 pts from defensive contributions in live explain."
+            />
             <th
               scope="col"
               className="live-picks-col-num live-picks-col-pts"
@@ -88,6 +95,18 @@ function PicksTable({ rows }) {
               </td>
               <td className="live-picks-col-pos tabular">{r.posSingular}</td>
               <td className="live-picks-col-num tabular">{r.minutes}</td>
+              <td
+                className="live-picks-col-alarm tabular"
+                {...(r.defensiveContribAlarm
+                  ? { 'aria-label': '2 points from defensive contributions' }
+                  : {})}
+              >
+                {r.defensiveContribAlarm ? (
+                  <span className="live-defensive-alarm" title="2 pts from defensive contributions (FPL live explain)">
+                    🚨
+                  </span>
+                ) : null}
+              </td>
               <td className="live-picks-col-num live-picks-col-pts tabular">
                 <strong>{r.total_points}</strong>
               </td>
@@ -153,9 +172,6 @@ function SquadLineupPanel({ squad }) {
   );
 }
 
-/**
- * @param {{ teams: Array<{ id: number, teamName: string, fplEntryId: number | null }>, matches?: Array<{ event: number, league_entry_1: number, league_entry_2: number, finished?: boolean, league_entry_1_points?: number, league_entry_2_points?: number }>, gameweek: number, onGameweekChange: (n: number) => void, teamLogoMap: object }}
- */
 function proxyHostLabel() {
   const raw = import.meta.env.VITE_FPL_PROXY_URL;
   if (raw == null || String(raw).trim() === '') return null;
@@ -172,12 +188,23 @@ function isLikelyLocalDev() {
   return h === 'localhost' || h === '127.0.0.1' || h === '[::1]';
 }
 
-export function LiveScores({ teams, matches = [], gameweek, onGameweekChange, teamLogoMap }) {
+/**
+ * @param {{ teams: Array<{ id: number, teamName: string, fplEntryId: number | null }>, matches?: Array<{ event: number, league_entry_1: number, league_entry_2: number, finished?: boolean, league_entry_1_points?: number, league_entry_2_points?: number }>, gameweek: number, onGameweekChange: (n: number) => void, onBootstrapLiveMeta?: (meta: { currentGw: number | null }) => void, teamLogoMap: object }}
+ */
+export function LiveScores({
+  teams,
+  matches = [],
+  gameweek,
+  onGameweekChange,
+  onBootstrapLiveMeta,
+  teamLogoMap,
+}) {
   const { loading, error, refresh, lastUpdated, events, eventSnapshot, squads } =
     useLiveScores({
       teams,
       gameweek,
       enabled: true,
+      onBootstrapLiveMeta,
     });
 
   /** Fixture keys in the set are expanded; default empty = all collapsed. */

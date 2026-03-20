@@ -110,6 +110,48 @@ export function explainBlocksFromLiveElement(raw) {
   return [];
 }
 
+/** FPL live `explain` identifier / draft `stat` for outfield defensive returns. */
+const DEFENSIVE_CONTRIBUTION_KEY = 'defensive_contribution';
+
+/**
+ * Sum of points from the defensive-contribution line in `event/live` explain (draft + classic).
+ * @param {object | null | undefined} raw — full live element row
+ * @returns {number}
+ */
+export function defensiveContributionPointsFromLiveRow(raw) {
+  const ex = raw?.explain;
+  if (!Array.isArray(ex) || ex.length === 0) return 0;
+  let sum = 0;
+  const first = ex[0];
+
+  if (Array.isArray(first) && first.length === 2 && typeof first[1] === 'number') {
+    for (const pair of ex) {
+      for (const s of pair[0] || []) {
+        if (s.stat === DEFENSIVE_CONTRIBUTION_KEY && Number.isFinite(Number(s.points))) {
+          sum += Number(s.points);
+        }
+      }
+    }
+    return sum;
+  }
+
+  if (first && first.fixture != null) {
+    for (const block of ex) {
+      for (const s of block.stats || []) {
+        if (s.identifier === DEFENSIVE_CONTRIBUTION_KEY && Number.isFinite(Number(s.points))) {
+          sum += Number(s.points);
+        }
+      }
+    }
+  }
+  return sum;
+}
+
+/** @param {object | null | undefined} raw */
+export function hasTwoDefensiveContributionPoints(raw) {
+  return defensiveContributionPointsFromLiveRow(raw) === 2;
+}
+
 /** @param {object} liveRow */
 export function activeExplainBlocks(liveRow) {
   return explainBlocksFromLiveElement(liveRow).filter((b) => b.minutes > 0);

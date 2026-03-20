@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useCallback } from 'react'
 import {
   useLeagueData,
   FORM_LAST_N,
@@ -10,6 +10,87 @@ import './App.css'
 
 const LEAGUE_TITLE = 'The Tri-Continental League of Titans'
 const LEAGUE_SEASON_SUB = '2025/26'
+
+/** Past champions — optional `entryId` (team-logos-web), or `bannerImage` (fills entire banner sheet) */
+const HALL_OF_CHAMPIONS = [
+  { season: '2020-21', team: 'Essex Ratigans' },
+  { season: '2021-22', team: 'Dalston Bellsprouts' },
+  { season: '2022-23', team: 'Dalston Benoit' },
+  {
+    season: '2023-24',
+    team: 'Toronto Wiggum',
+    bannerImage: 'hall-champions/toronto-wiggum.png',
+  },
+  {
+    season: '2024-25',
+    team: 'Soul Ze Moles',
+    bannerImage: 'hall-champions/soul-ze-moles.png',
+  },
+]
+
+function HallOfChampions({ logoMap }) {
+  return (
+    <section
+      className="tile hall-of-champions"
+      aria-labelledby="hall-champions-heading"
+    >
+      <h2 id="hall-champions-heading" className="hall-of-champions__main-title">
+        TCLOT Hall of Champions
+      </h2>
+      <div className="hall-of-champions__rule" aria-hidden="true" />
+      <ul className="hall-of-champions__list">
+        {HALL_OF_CHAMPIONS.map((row) => (
+          <li key={row.season} className="hall-champion-banner">
+            <div className="hall-champion-banner__rigging" aria-hidden="true">
+              <div className="hall-champion-banner__rod" />
+              <div className="hall-champion-banner__cords">
+                <span className="hall-champion-banner__cord" />
+                <span className="hall-champion-banner__cord" />
+              </div>
+            </div>
+            <div
+              className={
+                'hall-champion-banner__sheet' +
+                (row.bannerImage
+                  ? ' hall-champion-banner__sheet--fullbleed'
+                  : '')
+              }
+            >
+              {row.bannerImage ? (
+                <img
+                  className="hall-champion-banner__fullbleed-img"
+                  src={`${import.meta.env.BASE_URL}${row.bannerImage}`}
+                  alt={`${row.team}, ${row.season} season champion`}
+                  loading="lazy"
+                  decoding="async"
+                />
+              ) : null}
+              <div className="hall-champion-banner__sheet-content">
+                <p className="hall-champion-banner__team">{row.team}</p>
+                {row.bannerImage ? (
+                  <div
+                    className="hall-champion-banner__sheet-spacer"
+                    aria-hidden="true"
+                  />
+                ) : (
+                  <div className="hall-champion-banner__avatar">
+                    <TeamAvatar
+                      entryId={row.entryId ?? null}
+                      name={row.team}
+                      size="lg"
+                      logoMap={logoMap ?? {}}
+                    />
+                  </div>
+                )}
+                <p className="hall-champion-banner__season">{row.season} season</p>
+              </div>
+            </div>
+          </li>
+        ))}
+      </ul>
+    </section>
+  )
+}
 
 function FormCircles({ form }) {
   return (
@@ -176,6 +257,12 @@ function App() {
   const [waiverGwTableMode, setWaiverGwTableMode] = useState('out')
   const [dashboardView, setDashboardView] = useState('standings') // standings | waivers | trades | live
   const [liveGw, setLiveGw] = useState(null)
+  /** Draft bootstrap `events.current` — default Live tab GW when user has not chosen one. */
+  const [fplLiveLandingGw, setFplLiveLandingGw] = useState(null)
+
+  const onBootstrapLiveMeta = useCallback((meta) => {
+    setFplLiveLandingGw(meta?.currentGw ?? null)
+  }, [])
 
   /** drops-gw-live rows: waivers only (excludes free-agency rows used in Latest Waivers). */
   const waiverOutRowsWaiverOnly = useMemo(
@@ -350,9 +437,12 @@ function App() {
   const selectedFormTeamName =
     teamsForFormSelect.find((t) => t.id === activeFormEntry)?.teamName ?? ''
 
-  /** Live tab: default GW when `liveGw` unset; never pass NaN to FPL fetches. */
+  /**
+   * Live tab GW: explicit pick → FPL official current (from bootstrap) → first unfinished H2H in
+   * schedule → last finished — so e.g. GW31 shows while live, not GW30.
+   */
   const liveGameweek =
-    Number(liveGw ?? previousGameweek ?? nextEvent ?? 1) || 1
+    Number(liveGw ?? fplLiveLandingGw ?? nextEvent ?? previousGameweek ?? 1) || 1
 
   const renderGwFixture = (fx, i) => {
     const homeRank = rankByEntryId.get(fx.homeId)
@@ -494,6 +584,7 @@ function App() {
         <div className="dashboard-content">
           {dashboardView === 'standings' && (
             <>
+              <HallOfChampions logoMap={teamLogoMap} />
               <section
                 className="tile tile--standings"
                 aria-labelledby="standings-heading"
@@ -1345,6 +1436,7 @@ function App() {
               matches={matches ?? []}
               gameweek={liveGameweek}
               onGameweekChange={setLiveGw}
+              onBootstrapLiveMeta={onBootstrapLiveMeta}
               teamLogoMap={teamLogoMap}
             />
           )}

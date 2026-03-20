@@ -1558,6 +1558,10 @@ button.live-fixture-banner--toggle {
   width: 3rem;
 }
 
+.live-picks-table col.live-picks-col-alarm {
+  width: 1.75rem;
+}
+
 .live-picks-table col.live-picks-col-num.live-picks-col-pts {
   width: 5.25rem;
 }
@@ -1589,6 +1593,22 @@ button.live-fixture-banner--toggle {
   text-align: right;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
+}
+
+.live-picks-col-alarm {
+  text-align: center;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+.live-picks-col-alarm--head {
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+.live-defensive-alarm {
+  font-size: 1rem;
+  line-height: 1;
 }
 
 .live-player-cell {
@@ -2065,6 +2085,272 @@ button.live-fixture-banner--toggle {
   }
 }
 
+/* Hall of Champions — dark prestige list (gold headers, white body) */
+.tile.hall-of-champions {
+  --hall-bg: #121212;
+  --hall-gold: #e2b13c;
+  --hall-rule: rgba(255, 255, 255, 0.22);
+  --hall-muted: rgba(255, 255, 255, 0.55);
+  background: var(--hall-bg);
+  border: 1px solid #2a2a2a;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.28);
+}
+
+.hall-of-champions__main-title {
+  margin: 0 0 14px;
+  font-size: clamp(1.35rem, 3.5vw, 1.75rem);
+  font-weight: 800;
+  line-height: 1.12;
+  letter-spacing: -0.03em;
+  color: #fff;
+  text-align: center;
+}
+
+.hall-of-champions__rule {
+  height: 1px;
+  margin: 0 auto 22px;
+  max-width: min(420px, 88%);
+  background: var(--hall-rule);
+  border: none;
+}
+
+.hall-of-champions__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 10px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 4px 4px 8px;
+  scrollbar-color: rgba(226, 177, 60, 0.45) transparent;
+}
+
+/* Arena-style hanging banner per champion */
+.hall-champion-banner {
+  --hall-banner-min-height: 264px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 0;
+  flex: 1 1 0;
+  min-width: 106px;
+  max-width: 178px;
+}
+
+.hall-champion-banner__rigging {
+  width: min(88%, 94px);
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 2px;
+}
+
+.hall-champion-banner__rod {
+  width: 100%;
+  height: 3px;
+  border-radius: 2px;
+  background: linear-gradient(
+    90deg,
+    #4a453c 0%,
+    #8a7a58 22%,
+    #e2b13c 50%,
+    #8a7a58 78%,
+    #4a453c 100%
+  );
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.45);
+}
+
+.hall-champion-banner__cords {
+  width: 56%;
+  min-width: 48px;
+  display: flex;
+  justify-content: space-between;
+  margin-top: -1px;
+}
+
+.hall-champion-banner__cord {
+  width: 2px;
+  height: 11px;
+  border-radius: 1px;
+  background: linear-gradient(
+    180deg,
+    rgba(200, 200, 200, 0.85) 0%,
+    rgba(120, 118, 112, 0.65) 100%
+  );
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.35);
+}
+
+.hall-champion-banner__sheet {
+  position: relative;
+  width: 100%;
+  flex: 1;
+  min-height: var(--hall-banner-min-height);
+  box-sizing: border-box;
+  background: linear-gradient(180deg, #35302c 0%, #252220 48%, #1c1a18 100%);
+  border: 1px solid #4a433c;
+  border-radius: 3px 3px 5px 5px;
+  box-shadow:
+    0 10px 22px rgba(0, 0, 0, 0.42),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  overflow: hidden;
+}
+
+.hall-champion-banner__sheet-content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  min-height: var(--hall-banner-min-height);
+  height: 100%;
+  padding: 12px 8px 14px;
+  box-sizing: border-box;
+}
+
+/* Full-bleed hero: art fills the banner; type at top / bottom */
+.hall-champion-banner__sheet--fullbleed {
+  /* Lower % = anchor higher on source art → more “sky” at top of tile → figure sits lower → title clears head */
+  --hall-fullbleed-focus-y: 27%;
+  border-color: rgba(226, 177, 60, 0.35);
+  box-shadow:
+    0 10px 22px rgba(0, 0, 0, 0.42),
+    inset 0 0 0 1px rgba(226, 177, 60, 0.12);
+}
+
+/* Edge-to-edge cover; vertical % nudges where the “subject” sits between title + season */
+.hall-champion-banner__fullbleed-img {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center var(--hall-fullbleed-focus-y);
+  pointer-events: none;
+}
+
+/* Baked-in banner art already carries title/season; a dark scrim made edges unreadable */
+.hall-champion-banner__sheet--fullbleed::after {
+  display: none;
+}
+
+.hall-champion-banner__sheet--fullbleed .hall-champion-banner__sheet-content {
+  padding: 10px 7px 11px;
+}
+
+.hall-champion-banner__sheet--fullbleed .hall-champion-banner__team,
+.hall-champion-banner__sheet--fullbleed .hall-champion-banner__season {
+  flex-shrink: 0;
+  /* Titles are baked into banner art; keep markup out of the visual stack */
+  display: none;
+}
+
+.hall-champion-banner__sheet-spacer {
+  flex: 1 1 0;
+  min-height: 48px;
+  width: 100%;
+  pointer-events: none;
+}
+
+.hall-champion-banner__team {
+  margin: 0 0 10px;
+  font-size: clamp(0.68rem, 1.55vw, 0.82rem);
+  font-weight: 800;
+  line-height: 1.15;
+  color: var(--hall-gold);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-family: Inter, system-ui, sans-serif;
+  word-wrap: break-word;
+  overflow-wrap: anywhere;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.55);
+  max-width: 100%;
+}
+
+.hall-champion-banner__sheet--fullbleed .hall-champion-banner__team {
+  margin-bottom: 0;
+  font-family: Caveat, cursive;
+  font-weight: 700;
+  font-size: clamp(1.28rem, 3.6vw, 1.72rem);
+  letter-spacing: 0.015em;
+  line-height: 1.05;
+  text-transform: none;
+  color: #ffe566;
+  text-shadow:
+    0 2px 14px rgba(0, 0, 0, 0.92),
+    0 0 2px rgba(0, 0, 0, 0.85),
+    0 1px 0 rgba(0, 0, 0, 0.4);
+}
+
+.hall-champion-banner__avatar {
+  flex-shrink: 0;
+  width: 68px;
+  height: 68px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: auto 0;
+  border-radius: 50%;
+  border: 2px solid var(--hall-gold);
+  background: radial-gradient(circle at 30% 28%, #3d3834 0%, #141312 100%);
+  box-sizing: border-box;
+  box-shadow:
+    inset 0 2px 6px rgba(0, 0, 0, 0.45),
+    0 2px 8px rgba(0, 0, 0, 0.35);
+}
+
+.hall-champion-banner__avatar .team-avatar,
+.hall-champion-banner__avatar .team-badge {
+  width: 58px !important;
+  height: 58px !important;
+  border-radius: 50%;
+  border: none;
+}
+
+.hall-champion-banner__avatar .team-badge {
+  font-size: 0.9rem !important;
+  background: #2c2c2c !important;
+  color: #fff !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+.hall-champion-banner__avatar .team-avatar {
+  object-fit: cover;
+}
+
+.hall-champion-banner__season {
+  margin: 12px 0 0;
+  font-size: clamp(0.66rem, 1.45vw, 0.78rem);
+  font-weight: 700;
+  line-height: 1.3;
+  color: #fff;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  font-family: Inter, system-ui, sans-serif;
+}
+
+.hall-champion-banner__sheet--fullbleed .hall-champion-banner__season {
+  margin-top: 0;
+  font-family: Caveat, cursive;
+  font-weight: 700;
+  font-size: clamp(1.12rem, 3.1vw, 1.52rem);
+  letter-spacing: 0.015em;
+  line-height: 1.05;
+  text-transform: none;
+  color: #ffe566;
+  text-shadow:
+    0 2px 14px rgba(0, 0, 0, 0.92),
+    0 0 2px rgba(0, 0, 0, 0.85),
+    0 1px 0 rgba(0, 0, 0, 0.4);
+}
+
 .tile--team-form .form-team-toolbar {
   display: flex;
   flex-direction: column;
@@ -2413,6 +2699,13 @@ button.live-fixture-banner--toggle {
   font-size: 0.6rem;
 }
 
+.team-badge--lg {
+  width: 64px;
+  height: 64px;
+  font-size: 1.05rem;
+  border-width: 2px;
+}
+
 /* No translateZ/backface — those promote GPU layers and often blur downscaled photos */
 .team-avatar {
   width: 36px;
@@ -2429,6 +2722,12 @@ button.live-fixture-banner--toggle {
 .team-avatar--sm {
   width: 28px;
   height: 28px;
+}
+
+.team-avatar--lg {
+  width: 64px;
+  height: 64px;
+  border-width: 2px;
 }
 
 /* Form dots: W / D / L */

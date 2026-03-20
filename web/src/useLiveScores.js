@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import {
   allFixturesFinished,
   computeProvisionalGwBonusByElementId,
+  hasTwoDefensiveContributionPoints,
   participatingFixtureIdsForElement,
   selectDisplayBonus,
 } from './fplBonusFromBps';
@@ -140,13 +141,21 @@ function displayPlayerName(el, elementId) {
   return el.web_name ?? `Player #${elementId}`;
 }
 
-function mapPickRows(picks, liveByElementId, elementById, teamById, typeById) {
+function mapPickRows(
+  picks,
+  liveByElementId,
+  liveFullByElementId,
+  elementById,
+  teamById,
+  typeById
+) {
   const rows = (picks || []).map((p) => {
     const pid = Number(p.element);
     const el = elementById[pid];
     const tm = el ? teamById[el.team] : null;
     const typ = el ? typeById[el.element_type] : null;
     const st = liveByElementId[pid] || {};
+    const liveRow = liveFullByElementId[pid];
     const mins = st.minutes ?? 0;
     const pts = st.total_points ?? 0;
     const bps = st.bps ?? 0;
@@ -167,6 +176,7 @@ function mapPickRows(picks, liveByElementId, elementById, teamById, typeById) {
       bonusApi,
       bonus: bonusApi,
       pickPosition: p.position,
+      defensiveContribAlarm: hasTwoDefensiveContributionPoints(liveRow),
     };
   });
   rows.sort((a, b) => a.pickPosition - b.pickPosition);
@@ -192,9 +202,9 @@ function applyBonusColumn(rows, ctx) {
 /**
  * Live GW data from **draft** FPL APIs (browser fetch).
  * Uses draft bootstrap + draft event/live so element IDs match draft picks (classic uses a different id→player map).
- * @param {{ teams: Array<{ id: number, teamName: string, fplEntryId: number | null }>, gameweek: number | null, enabled: boolean }} opts
+ * @param {{ teams: Array<{ id: number, teamName: string, fplEntryId: number | null }>, gameweek: number | null, enabled: boolean, onBootstrapLiveMeta?: (meta: { currentGw: number | null }) => void }} opts
  */
-export function useLiveScores({ teams, gameweek, enabled }) {
+export function useLiveScores({ teams, gameweek, enabled, onBootstrapLiveMeta }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [lastUpdated, setLastUpdated] = useState(null);
@@ -205,6 +215,9 @@ export function useLiveScores({ teams, gameweek, enabled }) {
   /** Parent passes a new `teams` array each render; ref avoids infinite load loops. */
   const teamsRef = useRef(teams);
   teamsRef.current = teams;
+
+  const bootstrapMetaCbRef = useRef(onBootstrapLiveMeta);
+  bootstrapMetaCbRef.current = onBootstrapLiveMeta;
 
   /** When this goes 0 → N, we must re-fetch (load is not tied to `teams` by reference). */
   const teamCount = teams?.length ?? 0;
@@ -228,6 +241,11 @@ export function useLiveScores({ teams, gameweek, enabled }) {
       const evList = bootstrapEventList(boot);
       const currentGw = evRoot?.current;
       const nextGw = evRoot?.next;
+      const currentGwNum =
+        currentGw != null && Number.isFinite(Number(currentGw))
+          ? Number(currentGw)
+          : null;
+      bootstrapMetaCbRef.current?.({ currentGw: currentGwNum });
       const evs = evList.map((e) => ({
         ...e,
         is_current: e.id === currentGw,
@@ -316,6 +334,7 @@ export function useLiveScores({ teams, gameweek, enabled }) {
           const rows = mapPickRows(
             picks,
             liveByElementId,
+            liveFull,
             elementById,
             teamById,
             typeById
