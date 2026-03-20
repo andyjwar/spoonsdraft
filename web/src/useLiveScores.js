@@ -1,4 +1,10 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
+import {
+  allFixturesFinished,
+  computeProvisionalGwBonusByElementId,
+  participatingFixtureIdsForElement,
+  selectDisplayBonus,
+} from './fplBonusFromBps';
 
 /** Classic host — only used when resolving `fplApiBase()` with no proxy / non-dev. */
 const FPL_DIRECT = 'https://fantasy.premierleague.com/api';
@@ -36,6 +42,19 @@ function draftResourceUrl(path) {
     return `/__fpl/draft/${p}`;
   }
   return `${DRAFT_DIRECT}/${p}`;
+}
+
+/** Classic `fantasy.premierleague.com/api` path + query (fixtures, …). */
+function classicResourceUrl(pathAndQuery) {
+  const pq = String(pathAndQuery).replace(/^\/+/, '');
+  const base = fplApiBase();
+  if (base !== FPL_DIRECT) {
+    return `${base.replace(/\/$/, '')}/${pq}`;
+  }
+  if (import.meta.env.DEV) {
+    return `/__fpl/${pq}`;
+  }
+  return `${FPL_DIRECT}/${pq}`;
 }
 
 /**
@@ -80,6 +99,28 @@ function liveStatsByElementId(draftLiveJson) {
   return out;
 }
 
+/** Draft + classic live payloads: id → full element row (stats + explain). */
+function liveFullByElementId(liveJson) {
+  const raw = liveJson?.elements;
+  const out = {};
+  if (raw && typeof raw === 'object' && !Array.isArray(raw)) {
+    for (const [k, v] of Object.entries(raw)) {
+      const id = Number(k);
+      if (!Number.isFinite(id)) continue;
+      out[id] = v;
+    }
+    return out;
+  }
+  if (Array.isArray(raw)) {
+    for (const row of raw) {
+      const id = Number(row.id);
+      if (!Number.isFinite(id)) continue;
+      out[id] = row;
+    }
+  }
+  return out;
+}
+
 function shirtUrl(teamId) {
   if (teamId == null) return null;
   return `https://fantasy.premierleague.com/dist/img/shirts/standard/shirt_${teamId}-1.png`;
@@ -109,7 +150,7 @@ function mapPickRows(picks, liveByElementId, elementById, teamById, typeById) {
     const mins = st.minutes ?? 0;
     const pts = st.total_points ?? 0;
     const bps = st.bps ?? 0;
-    const bonus = st.bonus ?? 0;
+    const bonusApi = st.bonus ?? 0;
     const webName = el?.web_name ?? `Player #${pid}`;
     return {
       element: pid,
@@ -123,12 +164,29 @@ function mapPickRows(picks, liveByElementId, elementById, teamById, typeById) {
       minutes: mins,
       total_points: pts,
       bps,
-      bonus,
+      bonusApi,
+      bonus: bonusApi,
       pickPosition: p.position,
     };
   });
   rows.sort((a, b) => a.pickPosition - b.pickPosition);
   return rows;
+}
+
+function applyBonusColumn(rows, ctx) {
+  const { elementById, liveFullByElementId: liveFull, provisionalByElement, fixtureById, gwFixtures } =
+    ctx;
+  return rows.map((r) => {
+    const el = elementById[r.element];
+    const liveRow = liveFull[r.element];
+    const fxIds = participatingFixtureIdsForElement(el, liveRow, gwFixtures);
+    const finished = allFixturesFinished(fxIds, fixtureById);
+    const prov = provisionalByElement.get(r.element) ?? 0;
+    const display = selectDisplayBonus(r.bonusApi, prov, finished);
+    const total_points =
+      Number(r.total_points) - Number(r.bonusApi) + Number(display);
+    return { ...r, bonus: display, total_points };
+  });
 }
 
 /**
@@ -196,6 +254,32 @@ export function useLiveScores({ teams, gameweek, enabled }) {
       }
       const liveJson = await liveRes.json();
       const liveByElementId = liveStatsByElementId(liveJson);
+      const liveFull = liveFullByElementId(liveJson);
+
+      const fxUrl = classicResourceUrl(`fixtures?event=${gw}`);
+      const fxRes = await fetch(fxUrl);
+      if (!fxRes.ok) {
+        throw new Error(`classic fixtures HTTP ${fxRes.status}`);
+      }
+      const fixturesPayload = await fxRes.json();
+      const gwFixtures = Array.isArray(fixturesPayload)
+        ? fixturesPayload.filter((f) => Number(f.event) === gw)
+        : [];
+      const fixtureById = new Map(gwFixtures.map((f) => [Number(f.id), f]));
+
+      const provisionalByElement = computeProvisionalGwBonusByElementId(
+        boot.elements || [],
+        liveFull,
+        gwFixtures
+      );
+
+      const bonusCtx = {
+        elementById,
+        liveFullByElementId: liveFull,
+        provisionalByElement,
+        fixtureById,
+        gwFixtures,
+      };
 
       const squadList = await Promise.all(
         teamList.map(async (t) => {
@@ -236,8 +320,9 @@ export function useLiveScores({ teams, gameweek, enabled }) {
             teamById,
             typeById
           );
-          const starters = rows.filter((r) => r.pickPosition <= 11);
-          const bench = rows.filter((r) => r.pickPosition > 11);
+          const withBonus = applyBonusColumn(rows, bonusCtx);
+          const starters = withBonus.filter((r) => r.pickPosition <= 11);
+          const bench = withBonus.filter((r) => r.pickPosition > 11);
 
           const eh = picksPayload.entry_history;
           const gwPoints =

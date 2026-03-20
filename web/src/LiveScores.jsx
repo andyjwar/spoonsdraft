@@ -50,10 +50,18 @@ function PicksTable({ rows }) {
             <th scope="col" className="live-picks-col-num" title="Minutes">
               Mins
             </th>
-            <th scope="col" className="live-picks-col-num live-picks-col-pts">
+            <th
+              scope="col"
+              className="live-picks-col-num live-picks-col-pts"
+              title="Live FPL points; bonus in the total matches the Bonus column (including BPS estimate when not yet posted)."
+            >
               Pts
             </th>
-            <th scope="col" className="live-picks-col-num" title="Bonus points (often provisional until final)">
+            <th
+              scope="col"
+              className="live-picks-col-num"
+              title="FPL bonus when posted or after your fixtures finish; otherwise estimated from live BPS and official tie rules."
+            >
               Bonus
             </th>
           </tr>
@@ -96,10 +104,12 @@ function sumStarterPoints(starters) {
   return starters.reduce((acc, r) => acc + (Number(r.total_points) || 0), 0);
 }
 
-/** Draft picks often omit `entry_history.points`; fall back to XI sum from live stats. */
+/**
+ * XI total for banners / meta: sum of per-player Pts (includes provisional bonus when shown).
+ * Matches `entry_history.points` when FPL bonus matches our Bonus column; otherwise reflects BPS estimate.
+ */
 function liveGwDisplayTotal(squad) {
   if (!squad || squad.error) return null;
-  if (squad.gwPoints != null) return squad.gwPoints;
   if (!squad.starters?.length) return null;
   return sumStarterPoints(squad.starters);
 }
@@ -414,9 +424,9 @@ export function LiveScores({ teams, matches = [], gameweek, onGameweekChange, te
                     <div className="live-fixture-column-head">
                       <h3 className="live-fixture-column-title">{homeName}</h3>
                       <div className="live-squad-meta tabular">
-                        {homeSquad?.gwPoints != null ? (
+                        {homeLive != null ? (
                           <span className="live-squad-pts">
-                            <strong>{homeSquad.gwPoints}</strong> GW pts
+                            <strong>{homeLive}</strong> GW pts
                           </span>
                         ) : null}
                         {homeSquad?.pointsOnBench != null ? (
@@ -431,9 +441,9 @@ export function LiveScores({ teams, matches = [], gameweek, onGameweekChange, te
                     <div className="live-fixture-column-head">
                       <h3 className="live-fixture-column-title">{awayName}</h3>
                       <div className="live-squad-meta tabular">
-                        {awaySquad?.gwPoints != null ? (
+                        {awayLive != null ? (
                           <span className="live-squad-pts">
-                            <strong>{awaySquad.gwPoints}</strong> GW pts
+                            <strong>{awayLive}</strong> GW pts
                           </span>
                         ) : null}
                         {awaySquad?.pointsOnBench != null ? (
@@ -473,9 +483,9 @@ export function LiveScores({ teams, matches = [], gameweek, onGameweekChange, te
                   <span>{squad.teamName}</span>
                 </h3>
                 <div className="live-squad-meta tabular">
-                  {squad.gwPoints != null ? (
+                  {liveGwDisplayTotal(squad) != null ? (
                     <span className="live-squad-pts">
-                      <strong>{squad.gwPoints}</strong> GW pts
+                      <strong>{liveGwDisplayTotal(squad)}</strong> GW pts
                     </span>
                   ) : null}
                   {squad.pointsOnBench != null ? (
@@ -516,9 +526,9 @@ export function LiveScores({ teams, matches = [], gameweek, onGameweekChange, te
                   <span>{squad.teamName}</span>
                 </h3>
                 <div className="live-squad-meta tabular">
-                  {squad.gwPoints != null ? (
+                  {liveGwDisplayTotal(squad) != null ? (
                     <span className="live-squad-pts">
-                      <strong>{squad.gwPoints}</strong> GW pts
+                      <strong>{liveGwDisplayTotal(squad)}</strong> GW pts
                     </span>
                   ) : null}
                 </div>
