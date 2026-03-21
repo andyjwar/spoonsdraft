@@ -176,6 +176,21 @@ function liveGwDisplayTotal(squad) {
   return sumStarterPoints(squad.starters);
 }
 
+/** 3 / 1 / 0 from live GW score vs opponent (same as H2H table stakes). */
+function liveH2hBonusPts(myLive, oppLive) {
+  if (myLive == null || oppLive == null) return 0;
+  if (myLive > oppLive) return 3;
+  if (myLive < oppLive) return 0;
+  return 1;
+}
+
+/** GW column: league points from the live fixture (+3 / +1 / 0). */
+function formatGwLeaguePtsBonus(h2hBonus) {
+  if (h2hBonus === 3) return '+3';
+  if (h2hBonus === 1) return '+1';
+  return '0';
+}
+
 function teamNameForEntry(teams, leagueEntryId) {
   return teams?.find((t) => t.id === leagueEntryId)?.teamName ?? `Team ${leagueEntryId}`;
 }
@@ -306,18 +321,81 @@ export function LiveScores({
     return m;
   }, [squads]);
 
-  /** League table order (standing position) with this GW’s live points merged in. */
+  /** Opponent’s live GW total for this GW (for projected Faced / GD / H2H pts). */
+  const oppLiveGwByLeagueEntry = useMemo(() => {
+    const m = new Map();
+    for (const fx of gwMatches) {
+      const a = Number(fx.league_entry_1);
+      const b = Number(fx.league_entry_2);
+      const la = liveGwDisplayTotal(squadByLeagueEntry.get(a));
+      const lb = liveGwDisplayTotal(squadByLeagueEntry.get(b));
+      m.set(a, lb);
+      m.set(b, la);
+    }
+    return m;
+  }, [gwMatches, squadByLeagueEntry]);
+
+  /**
+   * Projected For / Faced / GD / PTS from this GW’s live fixtures, then sorted by projected PTS.
+   * `liveRank` = position after projection; `rankMove` = season # − live # (positive = climbed).
+   */
   const liveStandingsRows = useMemo(() => {
     if (!Array.isArray(tableRows) || tableRows.length === 0) return [];
     const enriched = tableRows.map((row) => {
-      const squad = squadByLeagueEntry.get(row.league_entry);
+      const eid = row.league_entry;
+      const squad = squadByLeagueEntry.get(eid);
       const liveGw = liveGwDisplayTotal(squad);
-      const ltp =
-        typeof squad?.leftToPlayCount === 'number' ? squad.leftToPlayCount : null;
-      return { ...row, liveGw, ltp };
+      const inFixture = oppLiveGwByLeagueEntry.has(eid);
+      const oppLiveGw = inFixture ? oppLiveGwByLeagueEntry.get(eid) : null;
+
+      const gf = Number(row.gf) || 0;
+      const ga = Number(row.ga) || 0;
+      const total = Number(row.total) || 0;
+      const addMine = liveGw != null ? liveGw : 0;
+      const addOpp =
+        inFixture && oppLiveGw != null && Number.isFinite(Number(oppLiveGw))
+          ? Number(oppLiveGw)
+          : 0;
+
+      const projectedFor = gf + addMine;
+      const projectedGa = ga + addOpp;
+      const projectedGd = projectedFor - projectedGa;
+      const h2hBonus =
+        inFixture && liveGw != null && oppLiveGw != null
+          ? liveH2hBonusPts(liveGw, oppLiveGw)
+          : 0;
+      const projectedPts = total + h2hBonus;
+
+      return {
+        ...row,
+        liveGw,
+        oppLiveGw: inFixture ? oppLiveGw : null,
+        projectedFor,
+        projectedGa,
+        projectedGd,
+        h2hBonus,
+        projectedPts,
+      };
     });
-    return [...enriched].sort((a, b) => (a.rank ?? 999) - (b.rank ?? 999));
-  }, [tableRows, squadByLeagueEntry]);
+    const sorted = [...enriched].sort((a, b) => {
+      const d = (b.projectedPts ?? 0) - (a.projectedPts ?? 0);
+      if (d !== 0) return d;
+      const g = (b.projectedGd ?? 0) - (a.projectedGd ?? 0);
+      if (g !== 0) return g;
+      const f = (b.projectedFor ?? 0) - (a.projectedFor ?? 0);
+      if (f !== 0) return f;
+      return (a.rank ?? 999) - (b.rank ?? 999);
+    });
+    let currentLiveRank = 0;
+    return sorted.map((row, i) => {
+      if (i === 0 || row.projectedPts !== sorted[i - 1].projectedPts) {
+        currentLiveRank = i + 1;
+      }
+      const liveRank = currentLiveRank;
+      const rankMove = (row.rank ?? 999) - liveRank;
+      return { ...row, liveRank, rankMove };
+    });
+  }, [tableRows, squadByLeagueEntry, oppLiveGwByLeagueEntry]);
 
   const pairedLeagueEntryIds = useMemo(() => {
     const s = new Set();
@@ -444,7 +522,8 @@ export function LiveScores({
           <span className="league-pill league-pill--sm">GW {gameweek}</span>
         </div>
         <p className="muted muted--tight live-standings-blurb">
-          Same order as the league table. GW shows live points for this gameweek (starter XI).
+          Ordered by projected PTS (season + 3 / 1 / 0 from each live H2H). For and Faced add this
+          GW’s live scores vs your opponent. ↑ / ↓ vs your league position before this GW.
         </p>
         {!tableRows?.length ? (
           <p className="muted muted--tight">No standings data.</p>
@@ -453,7 +532,7 @@ export function LiveScores({
             <table className="standings-table standings-table--sidebar standings-table--live">
               <thead>
                 <tr>
-                  <th className="col-rank" title="League table position">
+                  <th className="col-rank" title="Position by projected points this GW">
                     #
                   </th>
                   <th className="col-team">Team</th>
@@ -463,40 +542,54 @@ export function LiveScores({
                   <th className="col-num col-wdl">L</th>
                   <th
                     className="col-num col-for"
-                    title="Your team’s total FPL points across all H2H gameweeks"
+                    title="Season points for plus this GW’s live starter XI total"
                   >
                     For
                   </th>
-                  <th className="col-num col-faced">Faced</th>
-                  <th className="col-num col-gd">GD</th>
+                  <th
+                    className="col-num col-faced"
+                    title="Season points against plus opponent’s live GW total (when paired)"
+                  >
+                    Faced
+                  </th>
+                  <th
+                    className="col-num col-gd"
+                    title="Projected GD: projected For minus projected Faced"
+                  >
+                    GD
+                  </th>
                   <th
                     className="col-num col-live-gw"
-                    title="Live FPL points for this gameweek (starter XI; bonus column logic matches lineup view)"
+                    title="League points from this GW’s live fixture: +3 win, +1 draw, 0 loss"
                   >
                     GW
                   </th>
-                  <th className="col-num col-ltp" title={LEFT_TO_PLAY_TITLE}>
-                    LTP
+                  <th
+                    className="col-num col-pts"
+                    title="Season H2H points plus 3 / 1 / 0 from live score vs opponent this GW"
+                  >
+                    PTS
                   </th>
-                  <th className="col-num col-pts">PTS</th>
                 </tr>
               </thead>
               <tbody>
                 {liveStandingsRows.map((row) => {
-                  const isLeader = row.rank === 1;
+                  const isLeader = row.liveRank === 1;
                   const rowClass = [
                     isLeader ? 'row-highlight' : '',
-                    row.rank === 1 ? 'standings-row--divider-below' : '',
-                    row.rank === 8
+                    row.liveRank === 1 ? 'standings-row--divider-below' : '',
+                    row.liveRank === 8
                       ? 'standings-row--divider-above standings-row--8th'
                       : '',
                   ]
                     .filter(Boolean)
                     .join(' ');
+                  const moveUp = row.rankMove > 0;
+                  const moveDown = row.rankMove < 0;
                   return (
                     <tr key={row.league_entry} className={rowClass || undefined}>
                       <td className="col-rank">
-                        {row.rank === 8 ? (
+                        {row.liveRank === 8 ? (
                           <span
                             role="img"
                             className="standings-rank-8"
@@ -505,7 +598,7 @@ export function LiveScores({
                             🧩
                           </span>
                         ) : (
-                          row.rank
+                          row.liveRank
                         )}
                       </td>
                       <td className="col-team">
@@ -516,8 +609,26 @@ export function LiveScores({
                             size="sm"
                             logoMap={teamLogoMap}
                           />
-                          <span className="team-name team-name--sidebar">
+                          <span className="team-name team-name--sidebar live-standings-team-name">
                             {row.teamName}
+                            {moveUp ? (
+                              <span
+                                className="live-standings-move live-standings-move--up"
+                                title={`Up ${row.rankMove} vs league #${row.rank}`}
+                                aria-label={`Up ${row.rankMove} places vs league position ${row.rank}`}
+                              >
+                                ↑
+                              </span>
+                            ) : null}
+                            {moveDown ? (
+                              <span
+                                className="live-standings-move live-standings-move--down"
+                                title={`Down ${-row.rankMove} vs league #${row.rank}`}
+                                aria-label={`Down ${-row.rankMove} places vs league position ${row.rank}`}
+                              >
+                                ↓
+                              </span>
+                            ) : null}
                           </span>
                         </span>
                       </td>
@@ -525,25 +636,38 @@ export function LiveScores({
                       <td className="col-num col-wdl">{row.matches_won}</td>
                       <td className="col-num col-wdl">{row.matches_drawn}</td>
                       <td className="col-num col-wdl">{row.matches_lost}</td>
-                      <td className="col-num col-for tabular" title="Your points for, all GWs">
-                        {row.gf}
+                      <td
+                        className="col-num col-for tabular"
+                        title={`Season ${row.gf} + GW live${row.liveGw != null ? ` (${row.liveGw})` : ''}`}
+                      >
+                        {row.projectedFor}
                       </td>
-                      <td className="col-num col-faced tabular">{row.ga}</td>
+                      <td
+                        className="col-num col-faced tabular"
+                        title={`Season ${row.ga} + opponent GW${row.oppLiveGw != null ? ` (${row.oppLiveGw})` : ''}`}
+                      >
+                        {row.projectedGa}
+                      </td>
                       <td className="col-num col-gd tabular">
-                        {row.gd > 0 ? `+${row.gd}` : row.gd}
+                        {row.projectedGd > 0
+                          ? `+${row.projectedGd}`
+                          : row.projectedGd}
                       </td>
                       <td className="col-num col-live-gw tabular">
-                        {row.liveGw != null ? (
-                          <strong className="live-standings-gw-val">{row.liveGw}</strong>
-                        ) : (
-                          <span className="muted">—</span>
-                        )}
-                      </td>
-                      <td className="col-num col-ltp tabular">
-                        {row.ltp != null ? row.ltp : '—'}
+                        <strong
+                          className={
+                            row.h2hBonus === 3
+                              ? 'live-standings-gw-val live-standings-gw-val--win'
+                              : row.h2hBonus === 1
+                                ? 'live-standings-gw-val live-standings-gw-val--draw'
+                                : 'live-standings-gw-val live-standings-gw-val--loss'
+                          }
+                        >
+                          {formatGwLeaguePtsBonus(row.h2hBonus)}
+                        </strong>
                       </td>
                       <td className="col-num col-pts tabular">
-                        <strong>{row.total}</strong>
+                        <strong>{row.projectedPts}</strong>
                       </td>
                     </tr>
                   );
@@ -601,12 +725,14 @@ export function LiveScores({
                   </span>
                   <span className="live-fixture-banner__row">
                     <span className="live-fixture-banner__team live-fixture-banner__team--home">
-                      <TeamAvatar
-                        entryId={homeId}
-                        name={homeName}
-                        size="sm"
-                        logoMap={teamLogoMap}
-                      />
+                      <span className="live-fixture-banner__team-avatar">
+                        <TeamAvatar
+                          entryId={homeId}
+                          name={homeName}
+                          size="sm"
+                          logoMap={teamLogoMap}
+                        />
+                      </span>
                       <span className="live-fixture-banner__team-text live-fixture-banner__team-text--home">
                         <span className="live-fixture-banner__team-inner">
                           <span className="live-fixture-banner__name-line">
@@ -630,15 +756,39 @@ export function LiveScores({
                     </span>
 
                     <span className="live-fixture-banner__scorebox" aria-label="Gameweek points comparison">
-                      {homeLive != null && awayLive != null ? (
-                        <span className="live-fixture-banner__live-score tabular">
-                          <span className={homeLead ? 'live-fixture-pts--lead' : ''}>{homeLive}</span>
-                          <span className="live-fixture-banner__dash">–</span>
-                          <span className={awayLead ? 'live-fixture-pts--lead' : ''}>{awayLive}</span>
+                      <span className="live-fixture-banner__score-row">
+                        <span
+                          className="live-fixture-banner__score-avatar live-fixture-banner__score-avatar--home"
+                          aria-hidden="true"
+                        >
+                          <TeamAvatar
+                            entryId={homeId}
+                            name={homeName}
+                            size="sm"
+                            logoMap={teamLogoMap}
+                          />
                         </span>
-                      ) : (
-                        <span className="live-fixture-vs">v</span>
-                      )}
+                        {homeLive != null && awayLive != null ? (
+                          <span className="live-fixture-banner__live-score tabular">
+                            <span className={homeLead ? 'live-fixture-pts--lead' : ''}>{homeLive}</span>
+                            <span className="live-fixture-banner__dash">–</span>
+                            <span className={awayLead ? 'live-fixture-pts--lead' : ''}>{awayLive}</span>
+                          </span>
+                        ) : (
+                          <span className="live-fixture-vs">v</span>
+                        )}
+                        <span
+                          className="live-fixture-banner__score-avatar live-fixture-banner__score-avatar--away"
+                          aria-hidden="true"
+                        >
+                          <TeamAvatar
+                            entryId={awayId}
+                            name={awayName}
+                            size="sm"
+                            logoMap={teamLogoMap}
+                          />
+                        </span>
+                      </span>
                       <span className="muted live-fixture-banner__score-caption">GW pts (live)</span>
                     </span>
 
@@ -659,12 +809,14 @@ export function LiveScores({
                           ) : null}
                         </span>
                       </span>
-                      <TeamAvatar
-                        entryId={awayId}
-                        name={awayName}
-                        size="sm"
-                        logoMap={teamLogoMap}
-                      />
+                      <span className="live-fixture-banner__team-avatar">
+                        <TeamAvatar
+                          entryId={awayId}
+                          name={awayName}
+                          size="sm"
+                          logoMap={teamLogoMap}
+                        />
+                      </span>
                     </span>
                   </span>
                   {/* Mobile: bottom affordance — ▼ = collapsed (lineup below), ▲ = expanded (hide). */}

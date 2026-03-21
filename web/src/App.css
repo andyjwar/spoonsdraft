@@ -1534,6 +1534,25 @@ button.live-fixture-banner--toggle {
   min-width: 6.75rem;
 }
 
+/* Row of [home avatar] · score · [away avatar] on mobile; avatars hidden on desktop (see team-avatar). */
+.live-fixture-banner__score-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  min-width: 0;
+}
+
+.live-fixture-banner__score-avatar {
+  display: none;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  line-height: 0;
+}
+
 .live-fixture-banner__live-score {
   font-size: 1.35rem;
   font-weight: 800;
@@ -1646,6 +1665,18 @@ button.live-fixture-banner--toggle {
     min-width: 0;
     width: 100%;
     justify-self: stretch;
+  }
+
+  .live-fixture-banner__team-avatar {
+    display: none;
+  }
+
+  .live-fixture-banner__score-avatar {
+    display: flex;
+  }
+
+  .live-fixture-banner__score-row {
+    gap: 8px;
   }
 
   .live-fixture-banner__team-inner {
@@ -2983,17 +3014,48 @@ button.live-fixture-banner--toggle {
   font-size: 0.78rem;
 }
 
-/* Live tab: standings + GW live / LTP */
+/* Live tab: projected standings + GW league pts (+3/+1/0) */
 .standings-table--live .col-live-gw {
   text-align: right;
 }
 
-.standings-table--live .live-standings-gw-val {
-  color: var(--fm-accent);
+.standings-table--live .live-standings-gw-val--win {
+  color: var(--fm-win, #34d399);
+}
+
+.standings-table--live .live-standings-gw-val--draw {
+  color: var(--fm-draw, #9ca3af);
+}
+
+.standings-table--live .live-standings-gw-val--loss {
+  color: var(--fm-muted, rgba(255, 255, 255, 0.55));
 }
 
 .tile--live-standings .live-standings-blurb {
   margin-bottom: 10px;
+}
+
+.live-standings-team-name {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.live-standings-move {
+  display: inline-block;
+  font-size: 0.95em;
+  font-weight: 800;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.live-standings-move--up {
+  color: var(--fm-win, #34d399);
+}
+
+.live-standings-move--down {
+  color: var(--fm-loss, #f87171);
 }
 
 .standings-table .col-form {
@@ -3061,10 +3123,6 @@ button.live-fixture-banner--toggle {
   .standings-table .col-gd,
   .standings-table .col-form,
   .standings-table .col-next {
-    display: none;
-  }
-
-  .standings-table--live .col-ltp {
     display: none;
   }
 
