@@ -161,10 +161,20 @@ function PicksTable({ rows }) {
               >
                 {r.dcCount}
               </td>
-              <td className="live-picks-col-num live-picks-col-goals tabular">
+              <td
+                className={
+                  'live-picks-col-num live-picks-col-goals tabular' +
+                  ((Number(r.goalsScored) || 0) > 0 ? ' live-pick-cell--green' : '')
+                }
+              >
                 {r.goalsScored}
               </td>
-              <td className="live-picks-col-num live-picks-col-assists tabular">
+              <td
+                className={
+                  'live-picks-col-num live-picks-col-assists tabular' +
+                  ((Number(r.assists) || 0) > 0 ? ' live-pick-cell--green' : '')
+                }
+              >
                 {r.assists}
               </td>
               <td
