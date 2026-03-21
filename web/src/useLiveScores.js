@@ -189,6 +189,23 @@ function opponentShortLabelForTeam(teamId, gwFixtures, teamById) {
   return labels.length ? labels.join(' · ') : null;
 }
 
+/**
+ * 0 minutes and club still has at least one unfinished PL fixture this GW (or no fixture list).
+ * @param {number} minutes
+ * @param {number | null} teamId
+ * @param {object[]} gwFixtures
+ */
+function computeStillYetToPlayPl(minutes, teamId, gwFixtures) {
+  if ((Number(minutes) || 0) > 0) return false;
+  if (!Array.isArray(gwFixtures) || !gwFixtures.length) return true;
+  if (teamId == null || !Number.isFinite(teamId)) return false;
+  return gwFixtures.some(
+    (f) =>
+      (Number(f.team_h) === teamId || Number(f.team_a) === teamId) &&
+      f.finished_provisional !== true
+  );
+}
+
 function mapPickRows(
   picks,
   liveByElementId,
@@ -214,6 +231,8 @@ function mapPickRows(
     const webName = el?.web_name ?? `Player #${pid}`;
     const tid = el?.team != null ? Number(el.team) : null;
     const opponentShortLabel = opponentShortLabelForTeam(tid, gwFixtures, teamById);
+    const stillYetToPlayPl = computeStillYetToPlayPl(mins, tid, gwFixtures);
+    const leftToPlayStarter = p.position <= 11 && stillYetToPlayPl;
     return {
       element: pid,
       web_name: webName,
@@ -237,36 +256,18 @@ function mapPickRows(
       pickPosition: p.position,
       dcCount: defensiveContributionCountFromLiveRow(liveRow),
       clubGwFixturesFinished: teamAllGwFixturesFinished(tid, gwFixtures),
+      stillYetToPlayPl,
+      leftToPlayStarter,
     };
   });
   rows.sort((a, b) => a.pickPosition - b.pickPosition);
   return rows;
 }
 
-/**
- * Starting XI players still on 0 minutes while their real club has at least one
- * unfinished FPL fixture in this gameweek (avoids counting DNP after the match ends).
- */
-function countStartersLeftToPlay(starters, elementById, gwFixtures) {
+/** @param {object[]} starters */
+function countStartersLeftToPlay(starters) {
   if (!Array.isArray(starters) || !starters.length) return 0;
-  if (!Array.isArray(gwFixtures) || !gwFixtures.length) {
-    return starters.filter((r) => (Number(r.minutes) || 0) === 0).length;
-  }
-  let n = 0;
-  for (const r of starters) {
-    const el = elementById[r.element];
-    if (!el) continue;
-    const tid = Number(el.team);
-    if (!Number.isFinite(tid)) continue;
-    const clubFixtureOpen = gwFixtures.some(
-      (f) =>
-        (Number(f.team_h) === tid || Number(f.team_a) === tid) &&
-        f.finished_provisional !== true
-    );
-    if (!clubFixtureOpen) continue;
-    if ((Number(r.minutes) || 0) === 0) n++;
-  }
-  return n;
+  return starters.filter((r) => r.leftToPlayStarter).length;
 }
 
 function applyBonusColumn(rows, provisionalByElement) {
@@ -442,11 +443,7 @@ export function useLiveScores({ teams, gameweek, enabled, onBootstrapLiveMeta })
             projectedAutoSubs,
           } = buildEffectiveLineup({ starters, bench, autoSubs });
 
-          const leftToPlayCount = countStartersLeftToPlay(
-            starters,
-            elementById,
-            gwFixtures
-          );
+          const leftToPlayCount = countStartersLeftToPlay(starters);
 
           return {
             leagueEntryId: t.id,

@@ -1297,6 +1297,12 @@
   gap: 14px;
 }
 
+.live-scores-main-title {
+  font-size: 1.35rem !important;
+  font-weight: 800 !important;
+  letter-spacing: -0.02em;
+}
+
 .live-toolbar {
   display: flex;
   flex-wrap: wrap;
@@ -1365,6 +1371,110 @@
 .live-orphan-note {
   margin: 0 0 8px;
   font-size: 0.78rem;
+}
+
+.live-ltp-panel-tile {
+  margin-top: 0;
+}
+
+.live-ltp-fixture-banner.live-fixture-banner {
+  margin-bottom: 0;
+}
+
+.live-ltp-fixture-banner__text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.live-ltp-fixture-banner__title {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--fm-muted, #555);
+}
+
+.live-ltp-fixture-banner__title--only {
+  font-size: 1rem;
+  font-weight: 800;
+  text-transform: none;
+  letter-spacing: -0.01em;
+  color: var(--fm-text-strong, #111);
+}
+
+.live-ltp-panel-body {
+  padding: 0 14px 12px;
+  margin-top: -2px;
+}
+
+.live-ltp-fixture-block {
+  padding: 14px 0 16px;
+  border-bottom: 3px solid var(--fm-border-strong, #9ca3af);
+}
+
+.live-ltp-fixture-block:last-child {
+  border-bottom: none;
+  padding-bottom: 6px;
+}
+
+.live-ltp-summary-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.live-ltp-summary-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 14px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--fm-border, #e5e5e5);
+  font-size: 0.82rem;
+  line-height: 1.4;
+}
+
+.live-ltp-summary-row:last-child {
+  border-bottom: none;
+  padding-bottom: 2px;
+}
+
+.live-ltp-summary-team {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  flex: 0 1 auto;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.live-ltp-summary-score-inline {
+  flex-shrink: 0;
+  font-size: 1.05rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  color: var(--fm-text-strong, #111);
+  min-width: 1.5rem;
+  text-align: right;
+}
+
+.live-ltp-summary-team-name {
+  min-width: 0;
+  font-weight: 700;
+}
+
+.live-ltp-summary-players {
+  flex: 1 1 12rem;
+  min-width: 0;
+  color: var(--fm-text-strong, #111);
+}
+
+.live-ltp-summary-players-count {
+  font-weight: 600;
 }
 
 /* H2H fixture: two squads side by side */
@@ -1554,7 +1664,7 @@ button.live-fixture-banner--toggle {
 }
 
 .live-fixture-banner__live-score {
-  font-size: 1.35rem;
+  font-size: 1.55rem;
   font-weight: 800;
   letter-spacing: 0.02em;
   line-height: 1.15;

@@ -317,6 +317,33 @@ function teamNameForEntry(teams, leagueEntryId) {
   return teams?.find((t) => t.id === leagueEntryId)?.teamName ?? `Team ${leagueEntryId}`;
 }
 
+/** Last name token for live LTP summary (displayName is usually “First Last”). */
+function lastNameFromPickRow(r) {
+  const d = String(r.displayName ?? r.web_name ?? '').trim();
+  if (!d) return '?';
+  const parts = d.split(/\s+/).filter(Boolean);
+  return parts.length ? parts[parts.length - 1] : d;
+}
+
+/** Effective XI rows (post-autosub when available). */
+function startersForEffectiveXi(squad) {
+  if (!squad || squad.error) return [];
+  const nBench = squad.bench?.length ?? 0;
+  if (
+    squad.displayStarters?.length === 11 &&
+    squad.displayBench?.length === nBench
+  ) {
+    return squad.displayStarters;
+  }
+  return squad.starters ?? [];
+}
+
+function formatPlayerLtpSegment(r) {
+  const last = lastNameFromPickRow(r);
+  const opp = r.opponentShortLabel ?? '—';
+  return `${last} (${opp})`;
+}
+
 const LEFT_TO_PLAY_TITLE =
   'Starting XI players on 0 minutes whose club still has a Premier League fixture to finish this gameweek';
 
@@ -454,6 +481,9 @@ export function LiveScores({
     });
   }, []);
 
+  /** Single “Players left to play” panel for all H2H fixtures — collapsed by default. */
+  const [ltpPanelExpanded, setLtpPanelExpanded] = useState(false);
+
   const proxyHost = proxyHostLabel();
 
   const allMissingFplId =
@@ -562,6 +592,30 @@ export function LiveScores({
     });
   }, [tableRows, squadByLeagueEntry, oppLiveGwByLeagueEntry]);
 
+  /** One object per H2H fixture with both sides’ “left to play” lines. */
+  const leftToPlayByFixture = useMemo(() => {
+    if (!gwMatches.length) return [];
+    const buildSide = (leagueEntryId) => {
+      const squad = squadByLeagueEntry.get(leagueEntryId);
+      const name = teamNameForEntry(teams, leagueEntryId);
+      const live = liveGwDisplayTotal(squad);
+      const xi = startersForEffectiveXi(squad);
+      const segments = xi
+        .filter((r) => r.stillYetToPlayPl)
+        .map(formatPlayerLtpSegment);
+      return { leagueEntryId, name, live, segments };
+    };
+    return gwMatches.map((m) => {
+      const homeId = Number(m.league_entry_1);
+      const awayId = Number(m.league_entry_2);
+      return {
+        key: `${homeId}-${awayId}-${Number(gameweek)}`,
+        home: buildSide(homeId),
+        away: buildSide(awayId),
+      };
+    });
+  }, [gwMatches, teams, squadByLeagueEntry, gameweek]);
+
   const pairedLeagueEntryIds = useMemo(() => {
     const s = new Set();
     for (const m of gwMatches) {
@@ -591,7 +645,7 @@ export function LiveScores({
   return (
     <div className="dashboard-stack live-scores-root">
       <section className="tile tile--compact" aria-labelledby="live-heading">
-        <h2 id="live-heading" className="tile-title tile-title--sm">
+        <h2 id="live-heading" className="tile-title live-scores-main-title">
           Live scores
         </h2>
 
@@ -953,6 +1007,77 @@ export function LiveScores({
             </section>
           ))
         : null}
+
+      {leftToPlayByFixture.length > 0 ? (
+        <section
+          className="tile tile--compact live-ltp-panel-tile"
+          aria-label="Players left to play in H2H fixtures"
+        >
+          <button
+            type="button"
+            className="live-fixture-banner live-fixture-banner--toggle live-ltp-fixture-banner"
+            onClick={() => setLtpPanelExpanded((v) => !v)}
+            aria-expanded={ltpPanelExpanded}
+            aria-controls="live-ltp-panel-body"
+          >
+            <span className="live-fixture-chevron live-fixture-chevron--desktop" aria-hidden>
+              {ltpPanelExpanded ? '▼' : '▶'}
+            </span>
+            <span className="live-ltp-fixture-banner__text">
+              <span className="live-ltp-fixture-banner__title live-ltp-fixture-banner__title--only">
+                Players left to play
+              </span>
+            </span>
+            <span className="live-fixture-banner__expand-foot" aria-hidden>
+              <span className="live-fixture-chevron live-fixture-chevron--mobile">
+                {!ltpPanelExpanded ? '▼' : '▲'}
+              </span>
+            </span>
+          </button>
+
+          {ltpPanelExpanded ? (
+            <div className="live-ltp-panel-body" id="live-ltp-panel-body">
+              {leftToPlayByFixture.map((fx) => (
+                <div key={fx.key} className="live-ltp-fixture-block">
+                  <div className="live-ltp-summary-list">
+                    {[fx.home, fx.away].map((row) => (
+                      <div
+                        key={row.leagueEntryId}
+                        className="live-ltp-summary-row"
+                      >
+                        <span className="live-ltp-summary-team">
+                          <span className="live-ltp-summary-score-inline tabular">
+                            {row.live != null ? row.live : '—'}
+                          </span>
+                          <TeamAvatar
+                            entryId={row.leagueEntryId}
+                            name={row.name}
+                            size="sm"
+                            logoMap={teamLogoMap}
+                          />
+                          <strong className="live-ltp-summary-team-name">
+                            {row.name}
+                          </strong>
+                        </span>
+                        <span className="live-ltp-summary-players">
+                          <span className="live-ltp-summary-players-count muted tabular">
+                            ({row.segments.length})
+                          </span>
+                          {row.segments.length ? (
+                            <> {row.segments.join(', ')}</>
+                          ) : (
+                            <span className="muted"> None</span>
+                          )}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : null}
+        </section>
+      ) : null}
 
       <section
         className="tile tile--compact tile--live-standings"
