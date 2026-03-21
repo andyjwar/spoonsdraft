@@ -2,7 +2,6 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import {
   computeProvisionalGwBonusByElementId,
   defensiveContributionCountFromLiveRow,
-  hasTwoDefensiveContributionPoints,
   selectDisplayBonus,
 } from './fplBonusFromBps';
 
@@ -171,6 +170,8 @@ function mapPickRows(
     const st = liveByElementId[pid] || {};
     const liveRow = liveFullByElementId[pid];
     const mins = st.minutes ?? 0;
+    const goalsScored = Number(st.goals_scored) || 0;
+    const assists = Number(st.assists) || 0;
     const pts = st.total_points ?? 0;
     const bps = st.bps ?? 0;
     const bonusApi = st.bonus ?? 0;
@@ -186,12 +187,13 @@ function mapPickRows(
       shirtUrl: shirtUrl(el?.team),
       badgeUrl: badgeUrl(tm?.code),
       minutes: mins,
+      goalsScored,
+      assists,
       total_points: pts,
       bps,
       bonusApi,
       bonus: bonusApi,
       pickPosition: p.position,
-      defensiveContribAlarm: hasTwoDefensiveContributionPoints(liveRow),
       dcCount: defensiveContributionCountFromLiveRow(liveRow),
       clubGwFixturesFinished: teamAllGwFixturesFinished(tid, gwFixtures),
     };

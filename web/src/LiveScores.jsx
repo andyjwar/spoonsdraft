@@ -55,11 +55,13 @@ function PicksTable({ rows }) {
         <colgroup>
           <col className="live-picks-col-player" />
           <col className="live-picks-col-pos" />
-          <col className="live-picks-col-num" />
+          <col className="live-picks-col-num live-picks-col-mins" />
           <col className="live-picks-col-num live-picks-col-dc" />
+          <col className="live-picks-col-num live-picks-col-goals" />
+          <col className="live-picks-col-num live-picks-col-assists" />
+          <col className="live-picks-col-num live-picks-col-bonus" />
           <col className="live-picks-col-alarm" />
           <col className="live-picks-col-num live-picks-col-pts" />
-          <col className="live-picks-col-num" />
         </colgroup>
         <thead>
           <tr>
@@ -69,7 +71,11 @@ function PicksTable({ rows }) {
             <th scope="col" className="live-picks-col-pos">
               Pos
             </th>
-            <th scope="col" className="live-picks-col-num" title="Minutes">
+            <th
+              scope="col"
+              className="live-picks-col-num live-picks-col-mins"
+              title="Minutes"
+            >
               Mins
             </th>
             <th
@@ -81,23 +87,39 @@ function PicksTable({ rows }) {
             </th>
             <th
               scope="col"
+              className="live-picks-col-num live-picks-col-goals"
+              title="Goals scored this gameweek"
+              aria-label="Goals"
+            >
+              <span aria-hidden="true">⚽</span>
+            </th>
+            <th
+              scope="col"
+              className="live-picks-col-num live-picks-col-assists"
+              title="Assists this gameweek"
+              aria-label="Assists"
+            >
+              <span aria-hidden="true">🍑</span>
+            </th>
+            <th
+              scope="col"
+              className="live-picks-col-num live-picks-col-bonus"
+              title="Uses FPL bonus when stats.bonus is non-zero; otherwise BPS-based projection (keeps showing after full-time until FPL posts the final number)."
+            >
+              Bonus
+            </th>
+            <th
+              scope="col"
               className="live-picks-col-alarm live-picks-col-alarm--head"
               aria-label="Defensive contribution highlight"
               title="Shows when FPL awards exactly 2 pts from defensive contributions in live explain."
             />
             <th
               scope="col"
-              className="live-picks-col-num live-picks-col-pts"
+              className="live-picks-col-num live-picks-col-pts live-picks-col-pts--split"
               title="Live FPL points; bonus in the total matches the Bonus column (including BPS estimate when not yet posted)."
             >
               Pts
-            </th>
-            <th
-              scope="col"
-              className="live-picks-col-num"
-              title="Uses FPL bonus when stats.bonus is non-zero; otherwise BPS-based projection (keeps showing after full-time until FPL posts the final number)."
-            >
-              Bonus
             </th>
           </tr>
         </thead>
@@ -125,7 +147,9 @@ function PicksTable({ rows }) {
               </td>
               <td className="live-picks-col-pos tabular">{r.posSingular}</td>
               <td
-                className={['live-picks-col-num', 'tabular', minsTone].filter(Boolean).join(' ')}
+                className={['live-picks-col-num', 'live-picks-col-mins', 'tabular', minsTone]
+                  .filter(Boolean)
+                  .join(' ')}
               >
                 {r.minutes}
               </td>
@@ -137,22 +161,24 @@ function PicksTable({ rows }) {
               >
                 {r.dcCount}
               </td>
-              <td
-                className="live-picks-col-alarm tabular"
-                {...(r.defensiveContribAlarm
-                  ? { 'aria-label': '2 points from defensive contributions' }
-                  : {})}
-              >
-                {r.defensiveContribAlarm ? (
-                  <span className="live-defensive-alarm" title="2 pts from defensive contributions (FPL live explain)">
-                    🚨
-                  </span>
-                ) : null}
+              <td className="live-picks-col-num live-picks-col-goals tabular">
+                {r.goalsScored}
               </td>
-              <td className="live-picks-col-num live-picks-col-pts tabular">
+              <td className="live-picks-col-num live-picks-col-assists tabular">
+                {r.assists}
+              </td>
+              <td
+                className={
+                  'live-picks-col-num live-picks-col-bonus tabular' +
+                  ((Number(r.bonus) || 0) > 0 ? ' live-pick-cell--green' : '')
+                }
+              >
+                {r.bonus}
+              </td>
+              <td className="live-picks-col-alarm tabular" />
+              <td className="live-picks-col-num live-picks-col-pts live-picks-col-pts--split tabular">
                 <strong>{r.total_points}</strong>
               </td>
-              <td className="live-picks-col-num tabular">{r.bonus}</td>
             </tr>
             );
           })}
@@ -237,7 +263,9 @@ function SquadLineupPanel({ squad }) {
         </div>
       ) : null}
       <h4 className="live-lineup-heading">Starting XI</h4>
-      <PicksTable rows={squad.starters} />
+      <div className="live-picks-table-wrap live-picks-table-wrap--starting-xi-portrait">
+        <PicksTable rows={squad.starters} />
+      </div>
       <h4 className="live-lineup-heading live-lineup-heading--bench">Bench</h4>
       <PicksTable rows={squad.bench} />
     </>
@@ -337,7 +365,8 @@ export function LiveScores({
 
   /**
    * Projected For / Faced / GD / PTS from this GW’s live fixtures, then sorted by projected PTS,
-   * then For, then GD. `liveRank` = position after projection; `rankMove` = season # − live #.
+   * then For, then GD. `liveRank` = competition rank (ties share a #). `rankMove` uses ordinal
+   * list position (i + 1) vs season rank so movement still shows inside tied groups.
    */
   const liveStandingsRows = useMemo(() => {
     if (!Array.isArray(tableRows) || tableRows.length === 0) return [];
@@ -392,8 +421,9 @@ export function LiveScores({
         currentLiveRank = i + 1;
       }
       const liveRank = currentLiveRank;
-      const rankMove = (row.rank ?? 999) - liveRank;
-      return { ...row, liveRank, rankMove };
+      const ordinalLive = i + 1;
+      const rankMove = (row.rank ?? 999) - ordinalLive;
+      return { ...row, liveRank, ordinalLive, rankMove };
     });
   }, [tableRows, squadByLeagueEntry, oppLiveGwByLeagueEntry]);
 
@@ -799,11 +829,6 @@ export function LiveScores({
           </h2>
           <span className="league-pill league-pill--sm">GW {gameweek}</span>
         </div>
-        <p className="muted muted--tight live-standings-blurb">
-          Ordered by projected PTS (season + 3 / 1 / 0 from each live H2H). For and Faced add this
-          GW’s live scores vs your opponent. Same PTS: higher For ranks above, then GD. ↑ / ⬇ vs your
-          league position before this GW.
-        </p>
         {!tableRows?.length ? (
           <p className="muted muted--tight">No standings data.</p>
         ) : (
@@ -821,13 +846,13 @@ export function LiveScores({
                   <th className="col-num col-wdl">L</th>
                   <th
                     className="col-num col-for"
-                    title="Season points for plus this GW’s live starter XI total"
+                    title="Season points for, plus this GW’s live score vs your opponent"
                   >
                     For
                   </th>
                   <th
                     className="col-num col-faced"
-                    title="Season points against plus opponent’s live GW total (when paired)"
+                    title="Season points against, plus your opponent’s live GW score vs you (when paired)"
                   >
                     Faced
                   </th>
@@ -905,7 +930,7 @@ export function LiveScores({
                                 title={`Down ${-row.rankMove} vs league #${row.rank}`}
                                 aria-label={`Down ${-row.rankMove} places vs league position ${row.rank}`}
                               >
-                                ⬇
+                                ↓
                               </span>
                             ) : null}
                           </span>

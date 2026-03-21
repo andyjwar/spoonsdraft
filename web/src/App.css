@@ -1599,6 +1599,20 @@ button.live-fixture-banner--toggle {
 }
 
 @media (max-width: 560px) {
+  .tile.tile--compact.live-fixture-tile {
+    padding: 8px 10px !important;
+  }
+
+  .live-fixture-tile {
+    padding-top: 8px;
+  }
+
+  .live-fixture-banner {
+    margin-bottom: 10px;
+    padding: 9px 10px;
+    border-radius: 8px;
+  }
+
   button.live-fixture-banner--toggle {
     flex-direction: column;
     align-items: stretch;
@@ -1614,13 +1628,14 @@ button.live-fixture-banner--toggle {
     justify-content: center;
     align-items: center;
     width: 100%;
-    padding-top: 10px;
-    margin-top: 10px;
+    padding-top: 6px;
+    margin-top: 6px;
     border-top: 1px solid var(--fm-border);
   }
 
   .live-fixture-chevron--mobile {
-    font-size: 0.75rem;
+    width: 0.8rem;
+    font-size: 0.64rem;
     opacity: 0.55;
     line-height: 1;
   }
@@ -1634,8 +1649,8 @@ button.live-fixture-banner--toggle {
     grid-template-areas:
       'home vs away'
       'score score score';
-    column-gap: 8px;
-    row-gap: 10px;
+    column-gap: 6px;
+    row-gap: 8px;
     align-items: start;
   }
 
@@ -1805,7 +1820,7 @@ button.live-fixture-banner--toggle {
 
 .live-picks-table {
   width: 100%;
-  min-width: 29rem;
+  min-width: 33rem;
   table-layout: fixed;
   border-collapse: collapse;
   font-size: 0.8rem;
@@ -1828,12 +1843,23 @@ button.live-fixture-banner--toggle {
   width: 2.5rem;
 }
 
+.live-picks-table col.live-picks-col-goals,
+.live-picks-table col.live-picks-col-assists {
+  width: 2.35rem;
+}
+
 .live-picks-table col.live-picks-col-alarm {
   width: 1.75rem;
 }
 
 .live-picks-table col.live-picks-col-num.live-picks-col-pts {
   width: 5.25rem;
+}
+
+/* Vertical rule before points (FPL total) — separates returns from live score */
+.live-picks-table th.live-picks-col-pts--split,
+.live-picks-table td.live-picks-col-pts--split {
+  border-left: 1px solid var(--fm-border);
 }
 
 .live-picks-table th,
@@ -1849,6 +1875,13 @@ button.live-fixture-banner--toggle {
   font-size: 0.72rem;
   text-transform: uppercase;
   letter-spacing: 0.02em;
+}
+
+.live-picks-table th.live-picks-col-goals,
+.live-picks-table th.live-picks-col-assists {
+  text-transform: none;
+  font-size: 1rem;
+  line-height: 1;
 }
 
 /* Live Mins column (see livePickMinsCellClass in LiveScores.jsx) */
@@ -1890,11 +1923,6 @@ button.live-fixture-banner--toggle {
 .live-picks-col-alarm--head {
   padding-left: 4px;
   padding-right: 4px;
-}
-
-.live-defensive-alarm {
-  font-size: 1rem;
-  line-height: 1;
 }
 
 .live-player-cell {
@@ -1946,6 +1974,85 @@ button.live-fixture-banner--toggle {
 .live-player-webalt {
   font-size: 0.68rem;
   line-height: 1.2;
+}
+
+/* Starting XI only: portrait phones — badge + name, Mins, Pts (no horizontal scroll) */
+@media (max-width: 560px) and (orientation: portrait) {
+  .live-picks-table-wrap--starting-xi-portrait .table-scroll {
+    overflow-x: visible;
+  }
+
+  .live-picks-table-wrap--starting-xi-portrait .live-picks-table {
+    min-width: 0;
+    width: 100%;
+    font-size: 0.76rem;
+  }
+
+  .live-picks-table-wrap--starting-xi-portrait .live-picks-table col.live-picks-col-pos,
+  .live-picks-table-wrap--starting-xi-portrait .live-picks-table col.live-picks-col-dc,
+  .live-picks-table-wrap--starting-xi-portrait .live-picks-table col.live-picks-col-goals,
+  .live-picks-table-wrap--starting-xi-portrait .live-picks-table col.live-picks-col-assists,
+  .live-picks-table-wrap--starting-xi-portrait .live-picks-table col.live-picks-col-alarm,
+  .live-picks-table-wrap--starting-xi-portrait .live-picks-table col.live-picks-col-bonus {
+    display: none;
+  }
+
+  .live-picks-table-wrap--starting-xi-portrait .live-picks-table thead th.live-picks-col-pos,
+  .live-picks-table-wrap--starting-xi-portrait .live-picks-table thead th.live-picks-col-dc,
+  .live-picks-table-wrap--starting-xi-portrait .live-picks-table thead th.live-picks-col-goals,
+  .live-picks-table-wrap--starting-xi-portrait .live-picks-table thead th.live-picks-col-assists,
+  .live-picks-table-wrap--starting-xi-portrait .live-picks-table thead th.live-picks-col-alarm,
+  .live-picks-table-wrap--starting-xi-portrait .live-picks-table thead th.live-picks-col-bonus,
+  .live-picks-table-wrap--starting-xi-portrait .live-picks-table tbody td.live-picks-col-pos,
+  .live-picks-table-wrap--starting-xi-portrait .live-picks-table tbody td.live-picks-col-dc,
+  .live-picks-table-wrap--starting-xi-portrait .live-picks-table tbody td.live-picks-col-goals,
+  .live-picks-table-wrap--starting-xi-portrait .live-picks-table tbody td.live-picks-col-assists,
+  .live-picks-table-wrap--starting-xi-portrait .live-picks-table tbody td.live-picks-col-alarm,
+  .live-picks-table-wrap--starting-xi-portrait .live-picks-table tbody td.live-picks-col-bonus {
+    display: none;
+  }
+
+  .live-picks-table-wrap--starting-xi-portrait .live-picks-table col.live-picks-col-player {
+    width: 62%;
+  }
+
+  .live-picks-table-wrap--starting-xi-portrait .live-picks-table col.live-picks-col-mins {
+    width: 2.5rem;
+  }
+
+  .live-picks-table-wrap--starting-xi-portrait .live-picks-table col.live-picks-col-pts {
+    width: 2.75rem;
+  }
+
+  .live-picks-table-wrap--starting-xi-portrait .live-picks-table th,
+  .live-picks-table-wrap--starting-xi-portrait .live-picks-table td {
+    padding: 5px 6px;
+  }
+
+  .live-picks-table-wrap--starting-xi-portrait .live-picks-table th {
+    font-size: 0.65rem;
+  }
+
+  .live-picks-table-wrap--starting-xi-portrait .live-player-cell {
+    align-items: center;
+    gap: 6px;
+  }
+
+  .live-picks-table-wrap--starting-xi-portrait .live-kit-img {
+    width: 22px;
+    height: 28px;
+  }
+
+  .live-picks-table-wrap--starting-xi-portrait .live-kit-fallback {
+    width: 22px;
+    height: 22px;
+    font-size: 0.58rem;
+  }
+
+  .live-picks-table-wrap--starting-xi-portrait .live-player-name {
+    font-size: 0.76rem;
+    font-weight: 700;
+  }
 }
 
 .table-scroll--win-margin {
@@ -3031,10 +3138,6 @@ button.live-fixture-banner--toggle {
   color: var(--fm-muted, rgba(255, 255, 255, 0.55));
 }
 
-.tile--live-standings .live-standings-blurb {
-  margin-bottom: 10px;
-}
-
 .live-standings-team-name {
   display: inline-flex;
   align-items: center;
@@ -3055,7 +3158,7 @@ button.live-fixture-banner--toggle {
 }
 
 .live-standings-move--down {
-  color: var(--fm-loss, #f87171);
+  color: #dc2626;
 }
 
 .standings-table .col-form {
