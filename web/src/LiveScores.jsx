@@ -161,7 +161,7 @@ function PicksTable({ rows, autosubInElementIds }) {
         <tbody>
           {rows.map((r) => {
             const minsTone = livePickMinsCellClass(r);
-            const fullLabel = `${r.displayName ?? r.web_name} · #${r.element}${r.teamName ? ` · ${r.teamName}` : ''}`;
+            const fullLabel = `${r.displayName ?? r.web_name}${r.opponentShortLabel ? ` (${r.opponentShortLabel})` : ''} · #${r.element}${r.teamName ? ` · ${r.teamName}` : ''}`;
             const shownName = portraitLineup
               ? playerNameLineupPortrait(r.displayName, r.web_name)
               : r.displayName ?? r.web_name;
@@ -184,6 +184,12 @@ function PicksTable({ rows, autosubInElementIds }) {
                         title={fullLabel}
                       >
                         {shownName}
+                        {r.opponentShortLabel ? (
+                          <span className="live-player-opponent">
+                            {' '}
+                            ({r.opponentShortLabel})
+                          </span>
+                        ) : null}
                       </div>
                       {r.availabilityStatus === 'i' ? (
                         <span

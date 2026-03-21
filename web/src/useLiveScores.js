@@ -154,6 +154,41 @@ function teamAllGwFixturesFinished(teamId, gwFixtures) {
   return mine.every((f) => f.finished_provisional === true);
 }
 
+/**
+ * FPL `short_name` for opponent(s) this GW (e.g. `MUN`, or `LEE · BUR` for a double).
+ * @param {number | null} teamId
+ * @param {object[]} gwFixtures
+ * @param {Record<number, object>} teamById
+ * @returns {string | null}
+ */
+function opponentShortLabelForTeam(teamId, gwFixtures, teamById) {
+  if (teamId == null || !Number.isFinite(teamId)) return null;
+  if (!Array.isArray(gwFixtures) || !gwFixtures.length) return null;
+  const mine = gwFixtures.filter(
+    (f) => Number(f.team_h) === teamId || Number(f.team_a) === teamId
+  );
+  if (!mine.length) return null;
+  const sorted = mine.slice().sort((a, b) => {
+    const ka = a.kickoff_time != null ? String(a.kickoff_time) : '';
+    const kb = b.kickoff_time != null ? String(b.kickoff_time) : '';
+    return ka.localeCompare(kb);
+  });
+  /** @type {string[]} */
+  const labels = [];
+  const seen = new Set();
+  for (const f of sorted) {
+    const th = Number(f.team_h);
+    const ta = Number(f.team_a);
+    const opp = th === teamId ? ta : th;
+    const t = teamById[opp];
+    const short = t?.short_name;
+    if (!short || seen.has(short)) continue;
+    seen.add(short);
+    labels.push(String(short));
+  }
+  return labels.length ? labels.join(' · ') : null;
+}
+
 function mapPickRows(
   picks,
   liveByElementId,
@@ -178,6 +213,7 @@ function mapPickRows(
     const bonusApi = st.bonus ?? 0;
     const webName = el?.web_name ?? `Player #${pid}`;
     const tid = el?.team != null ? Number(el.team) : null;
+    const opponentShortLabel = opponentShortLabelForTeam(tid, gwFixtures, teamById);
     return {
       element: pid,
       web_name: webName,
@@ -187,6 +223,7 @@ function mapPickRows(
       availabilityNews: el?.news != null ? String(el.news) : null,
       teamShort: tm?.short_name ?? '—',
       teamName: tm?.name ?? null,
+      opponentShortLabel,
       posSingular: typ?.singular_name_short ?? '—',
       shirtUrl: shirtUrl(el?.team),
       badgeUrl: badgeUrl(tm?.code),

@@ -1970,6 +1970,12 @@ button.live-fixture-banner--toggle {
   line-height: 1;
 }
 
+.live-player-opponent {
+  color: var(--fm-muted, #666);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
 .live-kit-img {
   width: 28px;
   height: 36px;
