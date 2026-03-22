@@ -3454,6 +3454,7 @@ button.live-fixture-banner--toggle {
   width: 36px;
   height: 36px;
   border-radius: 50%;
+  overflow: hidden;
   font-size: 0.7rem;
   font-weight: 700;
   flex-shrink: 0;

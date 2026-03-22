@@ -15,29 +15,77 @@ function buildSrcList(entryId, logoMap) {
   return list
 }
 
+const KIT_TEXT_SHADOW =
+  '0 0 4px rgba(0, 0, 0, 0.75), 0 1px 2px rgba(0, 0, 0, 0.55)'
+
 /**
- * Hand-picked dark backgrounds (white initials): spaced around the wheel with varied
- * saturation/chroma so neighbours don’t read as “another blue-green”.
+ * Eight default “shirt” looks for an 8-team league (slot = stable hash % 8).
+ * Order: solid blue, blue/white stripes, matte red, forest green, black/white stripes,
+ * rust orange, yellow/green stripes, aubergine.
  */
-const BADGE_BG_PALETTE = [
-  '#b42318',
-  '#c2410c',
-  '#b45309',
-  '#a15c07',
-  '#3f6212',
-  '#166534',
-  '#047857',
-  '#0f766e',
-  '#0e7490',
-  '#0369a1',
-  '#1d4ed8',
-  '#3730a3',
-  '#5b21b6',
-  '#6b21a8',
-  '#86198f',
-  '#a3005c',
-  '#be123c',
-  '#854d0e',
+const KIT_STYLES = [
+  {
+    style: {
+      background: '#1d4ed8',
+      color: '#f8fafc',
+      textShadow: '0 1px 2px rgba(0, 0, 0, 0.45)',
+    },
+  },
+  {
+    style: {
+      backgroundColor: '#1e3a8a',
+      backgroundImage:
+        'repeating-linear-gradient(90deg, #f1f5f9 0 5px, #1e40af 5px 10px)',
+      color: '#ffffff',
+      textShadow: KIT_TEXT_SHADOW,
+    },
+  },
+  {
+    style: {
+      background: '#9f1b2e',
+      color: '#fafafa',
+      textShadow: '0 1px 2px rgba(0, 0, 0, 0.5)',
+    },
+  },
+  {
+    style: {
+      background: '#14532d',
+      color: '#f0fdf4',
+      textShadow: '0 1px 2px rgba(0, 0, 0, 0.45)',
+    },
+  },
+  {
+    style: {
+      backgroundColor: '#0a0a0a',
+      backgroundImage:
+        'repeating-linear-gradient(90deg, #fafafa 0 4px, #171717 4px 8px)',
+      color: '#ffffff',
+      textShadow: KIT_TEXT_SHADOW,
+    },
+  },
+  {
+    style: {
+      background: '#c2410c',
+      color: '#fff7ed',
+      textShadow: '0 1px 2px rgba(0, 0, 0, 0.45)',
+    },
+  },
+  {
+    style: {
+      backgroundColor: '#14532d',
+      backgroundImage:
+        'repeating-linear-gradient(90deg, #eab308 0 4px, #166534 4px 8px)',
+      color: '#ffffff',
+      textShadow: KIT_TEXT_SHADOW,
+    },
+  },
+  {
+    style: {
+      background: '#4a1d4d',
+      color: '#faf5ff',
+      textShadow: '0 1px 2px rgba(0, 0, 0, 0.5)',
+    },
+  },
 ]
 
 function fnv1a32(str) {
@@ -49,26 +97,21 @@ function fnv1a32(str) {
   return h >>> 0
 }
 
-/** Index into palette — FNV + golden-ratio mix so sequential ids don’t pick adjacent slots. */
-function badgePaletteIndex(entryId, name) {
+/** Pick one of eight kits — FNV + golden-ratio mix spreads sequential entry ids. */
+function kitStyleIndex(entryId, name) {
   const key = `${entryId == null ? '' : String(entryId)}\u{1e}${name == null ? '' : String(name)}`
   const h = fnv1a32(key)
   const mixed = Math.imul(h, 2654435769) >>> 0
-  return mixed % BADGE_BG_PALETTE.length
+  return mixed % KIT_STYLES.length
 }
 
 function InitialsBadge({ name, entryId, size }) {
   const initial = (name || '?').slice(0, 2).toUpperCase()
-  const bg = BADGE_BG_PALETTE[badgePaletteIndex(entryId, name)]
-  const fg = '#f5f5f5'
+  const kit = KIT_STYLES[kitStyleIndex(entryId, name)].style
   return (
     <span
       className={`team-badge team-badge--${size}`}
-      style={{
-        background: bg,
-        color: fg,
-        textShadow: '0 1px 2px rgba(0, 0, 0, 0.45)',
-      }}
+      style={kit}
       aria-hidden
     >
       {initial}
