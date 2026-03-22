@@ -1,4 +1,5 @@
-import { useState, useMemo, useCallback } from 'react'
+import { useState, useMemo, useCallback, useEffect } from 'react'
+import { showDashboardHall, showDashboardTrades } from './siteFeatures'
 import {
   useLeagueData,
   FORM_LAST_N,
@@ -282,6 +283,16 @@ function App() {
   const onBootstrapLiveMeta = useCallback((meta) => {
     setFplLiveLandingGw(meta?.currentGw ?? null)
   }, [])
+
+  useEffect(() => {
+    if (dashboardView === 'trades' && !showDashboardTrades) {
+      setDashboardView('standings')
+      return
+    }
+    if (dashboardView === 'hall' && !showDashboardHall) {
+      setDashboardView('standings')
+    }
+  }, [dashboardView, showDashboardTrades, showDashboardHall])
 
   /** drops-gw-live rows: waivers only (excludes free-agency rows used in Latest Waivers). */
   const waiverOutRowsWaiverOnly = useMemo(
@@ -618,34 +629,38 @@ function App() {
             </span>
             <span className="dashboard-nav__label">Waivers</span>
           </button>
-          <button
-            type="button"
-            className={
-              'dashboard-nav__btn' +
-              (dashboardView === 'trades' ? ' dashboard-nav__btn--active' : '')
-            }
-            onClick={() => setDashboardView('trades')}
-            aria-current={dashboardView === 'trades' ? 'page' : undefined}
-          >
-            <span className="dashboard-nav__emoji" aria-hidden="true">
-              🤝
-            </span>
-            <span className="dashboard-nav__label">Trades</span>
-          </button>
-          <button
-            type="button"
-            className={
-              'dashboard-nav__btn' +
-              (dashboardView === 'hall' ? ' dashboard-nav__btn--active' : '')
-            }
-            onClick={() => setDashboardView('hall')}
-            aria-current={dashboardView === 'hall' ? 'page' : undefined}
-          >
-            <span className="dashboard-nav__emoji" aria-hidden="true">
-              🏆
-            </span>
-            <span className="dashboard-nav__label">Hall of Champions</span>
-          </button>
+          {showDashboardTrades ? (
+            <button
+              type="button"
+              className={
+                'dashboard-nav__btn' +
+                (dashboardView === 'trades' ? ' dashboard-nav__btn--active' : '')
+              }
+              onClick={() => setDashboardView('trades')}
+              aria-current={dashboardView === 'trades' ? 'page' : undefined}
+            >
+              <span className="dashboard-nav__emoji" aria-hidden="true">
+                🤝
+              </span>
+              <span className="dashboard-nav__label">Trades</span>
+            </button>
+          ) : null}
+          {showDashboardHall ? (
+            <button
+              type="button"
+              className={
+                'dashboard-nav__btn' +
+                (dashboardView === 'hall' ? ' dashboard-nav__btn--active' : '')
+              }
+              onClick={() => setDashboardView('hall')}
+              aria-current={dashboardView === 'hall' ? 'page' : undefined}
+            >
+              <span className="dashboard-nav__emoji" aria-hidden="true">
+                🏆
+              </span>
+              <span className="dashboard-nav__label">Hall of Champions</span>
+            </button>
+          ) : null}
           <button
             type="button"
             className={
@@ -1013,7 +1028,9 @@ function App() {
             </>
           )}
 
-          {dashboardView === 'hall' && <HallOfChampions logoMap={teamLogoMap} />}
+          {showDashboardHall && dashboardView === 'hall' ? (
+            <HallOfChampions logoMap={teamLogoMap} />
+          ) : null}
 
           {dashboardView === 'waivers' && (
             <div className="dashboard-stack">
@@ -1449,7 +1466,7 @@ function App() {
             </div>
           )}
 
-          {dashboardView === 'trades' && (
+          {showDashboardTrades && dashboardView === 'trades' ? (
             <div className="dashboard-stack">
               <section className="tile tile--compact" aria-labelledby="trades-heading">
                 <h2 id="trades-heading" className="tile-title tile-title--sm">
@@ -1470,7 +1487,7 @@ function App() {
                 )}
               </section>
             </div>
-          )}
+          ) : null}
 
           {dashboardView === 'live' && (
             <LiveScores
