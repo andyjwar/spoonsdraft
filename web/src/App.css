@@ -213,7 +213,7 @@
   .dashboard-layout--with-nav > .dashboard-nav .dashboard-nav__btn {
     flex: 0 0 auto;
     min-width: 132px;
-    min-height: 76px;
+    min-height: 80px;
     width: auto;
     align-self: stretch;
     justify-content: center;
@@ -262,9 +262,18 @@
     flex: unset;
     min-width: 0;
     width: auto;
-    min-height: 76px;
+    min-height: 80px;
+    padding: 14px 12px;
     justify-content: center;
     text-align: center;
+  }
+
+  /*
+   * Odd number of tabs: last child is nth-child(odd) → span full row (e.g. Live Scoring).
+   * Even count: last is nth-child(even) → stays one column like the others in that row.
+   */
+  .dashboard-layout--with-nav > .dashboard-nav .dashboard-nav__btn:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
   }
 }
 
