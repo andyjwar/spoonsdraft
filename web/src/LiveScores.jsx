@@ -459,7 +459,7 @@ export function LiveScores({
   teamLogoMap,
   kitIndexByEntry,
 }) {
-  const { loading, error, refresh, lastUpdated, events, eventSnapshot, squads } =
+  const { loading, error, refresh, events, eventSnapshot, squads } =
     useLiveScores({
       teams,
       gameweek,
@@ -698,6 +698,7 @@ export function LiveScores({
 
         <div className="live-toolbar">
           <label className="live-gw-label">
+            <span className="live-gw-field-label">Gameweek</span>
             <select
               className="live-gw-select"
               aria-label="Gameweek"
@@ -728,11 +729,6 @@ export function LiveScores({
         </div>
 
         {metaLine ? <p className="muted live-meta">{metaLine}</p> : null}
-        {lastUpdated ? (
-          <p className="muted muted--tight live-updated">
-            Last fetch: {new Date(lastUpdated).toLocaleString()}
-          </p>
-        ) : null}
 
         {error ? (
           <div className="data-banner data-banner--error" role="alert">

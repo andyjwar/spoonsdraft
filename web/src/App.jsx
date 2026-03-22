@@ -297,12 +297,6 @@ function App() {
     setFplLiveLandingGw(meta?.currentGw ?? null)
   }, [])
 
-  const dashboardNavCount =
-    3 +
-    (showDashboardPlayoff ? 1 : 0) +
-    (showDashboardTrades ? 1 : 0) +
-    (showDashboardHall ? 1 : 0)
-
   useEffect(() => {
     if (dashboardView === 'trades' && !showDashboardTrades) {
       setDashboardView('live')
@@ -641,13 +635,7 @@ function App() {
             )}
           </header>
         </div>
-        <nav
-          className={
-            'dashboard-nav' +
-            (dashboardNavCount === 3 ? ' dashboard-nav--count-3' : '')
-          }
-          aria-label="Dashboard sections"
-        >
+        <nav className="dashboard-nav" aria-label="Dashboard sections">
           <button
             type="button"
             className={
