@@ -279,7 +279,7 @@ function App() {
   const [waiverOutTeamFilter, setWaiverOutTeamFilter] = useState('all')
   const [waiverOutGwFilter, setWaiverOutGwFilter] = useState('all')
   const [waiverGwTableMode, setWaiverGwTableMode] = useState('out')
-  const [dashboardView, setDashboardView] = useState('standings') // standings | playoff | waivers | trades | live | hall
+  const [dashboardView, setDashboardView] = useState('live') // standings | playoff | waivers | trades | live | hall
   const [liveGw, setLiveGw] = useState(null)
   /** Draft bootstrap `events.current` — default Live tab GW when user has not chosen one. */
   const [fplLiveLandingGw, setFplLiveLandingGw] = useState(null)
@@ -288,17 +288,23 @@ function App() {
     setFplLiveLandingGw(meta?.currentGw ?? null)
   }, [])
 
+  const dashboardNavCount =
+    3 +
+    (showDashboardPlayoff ? 1 : 0) +
+    (showDashboardTrades ? 1 : 0) +
+    (showDashboardHall ? 1 : 0)
+
   useEffect(() => {
     if (dashboardView === 'trades' && !showDashboardTrades) {
-      setDashboardView('standings')
+      setDashboardView('live')
       return
     }
     if (dashboardView === 'hall' && !showDashboardHall) {
-      setDashboardView('standings')
+      setDashboardView('live')
       return
     }
     if (dashboardView === 'playoff' && !showDashboardPlayoff) {
-      setDashboardView('standings')
+      setDashboardView('live')
     }
   }, [
     dashboardView,
@@ -611,7 +617,13 @@ function App() {
             )}
           </header>
         </div>
-        <nav className="dashboard-nav" aria-label="Dashboard sections">
+        <nav
+          className={
+            'dashboard-nav' +
+            (dashboardNavCount === 3 ? ' dashboard-nav--count-3' : '')
+          }
+          aria-label="Dashboard sections"
+        >
           <button
             type="button"
             className={

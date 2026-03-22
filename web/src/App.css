@@ -216,6 +216,21 @@
     width: auto;
   }
 
+  /* Exactly 3 tabs (e.g. Standings, Waivers, Live): Live grows to fill row width */
+  .dashboard-layout--with-nav > .dashboard-nav.dashboard-nav--count-3 {
+    overflow-x: visible;
+  }
+
+  .dashboard-layout--with-nav > .dashboard-nav.dashboard-nav--count-3 .dashboard-nav__btn:not(:last-child) {
+    flex: 0 0 auto;
+    min-width: 120px;
+  }
+
+  .dashboard-layout--with-nav > .dashboard-nav.dashboard-nav--count-3 .dashboard-nav__btn:last-child {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
   .dashboard-sidebar {
     position: static !important;
   }
@@ -240,6 +255,11 @@
   }
 
   .dashboard-layout--with-nav > .dashboard-nav .dashboard-nav__btn:nth-child(5) {
+    grid-column: 1 / -1;
+  }
+
+  /* Three tabs: 2×2 grid with Live full width on bottom row */
+  .dashboard-layout--with-nav > .dashboard-nav.dashboard-nav--count-3 .dashboard-nav__btn:last-child {
     grid-column: 1 / -1;
   }
 }
