@@ -51,6 +51,33 @@ function useFormStripDisplayCount() {
   return useSyncExternalStore(subscribe, getSnapshot, () => FORM_STRIP_DESKTOP_N)
 }
 
+/** Last whitespace-delimited segment (e.g. "Toronto Oizo" → "Oizo"). Single-word names unchanged. */
+function teamNameLastWord(name) {
+  if (typeof name !== 'string') return ''
+  const parts = name.trim().split(/\s+/).filter(Boolean)
+  if (parts.length <= 1) return parts[0] ?? ''
+  return parts[parts.length - 1]
+}
+
+/** Matches `.trade-card` portrait rules: narrow view + portrait orientation. */
+function usePortraitTradeTeamAbbrev() {
+  const subscribe = useCallback((onChange) => {
+    if (typeof window === 'undefined') return () => {}
+    const mq = window.matchMedia(
+      '(max-width: 1080px) and (orientation: portrait)',
+    )
+    mq.addEventListener('change', onChange)
+    return () => mq.removeEventListener('change', onChange)
+  }, [])
+  const getSnapshot = useCallback(() => {
+    if (typeof window === 'undefined') return false
+    return window.matchMedia(
+      '(max-width: 1080px) and (orientation: portrait)',
+    ).matches
+  }, [])
+  return useSyncExternalStore(subscribe, getSnapshot, () => false)
+}
+
 /** Past champions — optional `entryId` (team-logos-web), or `bannerImage` (fills entire banner sheet) */
 const HALL_OF_CHAMPIONS = [
   {
@@ -220,6 +247,7 @@ function TradePlayerLine({ leg }) {
 
 /** Single processed-trade card (GW, date, managers, pairs + tenure points). */
 function TradeCardArticle({ trade, teamLogoMap, kitIndexByEntry = {} }) {
+  const portraitAbbrev = usePortraitTradeTeamAbbrev()
   const pairs = trade.pairs || []
   const offeredPtsTotal = pairs.reduce(
     (s, p) => s + (Number(p.offeredLeg?.totalPoints) || 0),
@@ -256,7 +284,15 @@ function TradeCardArticle({ trade, teamLogoMap, kitIndexByEntry = {} }) {
             logoMap={teamLogoMap}
             kitIndexByEntry={kitIndexByEntry}
           />
-          <span className="trade-card__mgr-name">{trade.offeredTeamName}</span>
+          <span
+            className="trade-card__mgr-name"
+            title={trade.offeredTeamName}
+            aria-label={trade.offeredTeamName}
+          >
+            {portraitAbbrev
+              ? teamNameLastWord(trade.offeredTeamName)
+              : trade.offeredTeamName}
+          </span>
         </div>
         <div
           className="trade-card__pts-summary trade-card__pts-summary--center"
@@ -282,7 +318,15 @@ function TradeCardArticle({ trade, teamLogoMap, kitIndexByEntry = {} }) {
             logoMap={teamLogoMap}
             kitIndexByEntry={kitIndexByEntry}
           />
-          <span className="trade-card__mgr-name">{trade.receivedTeamName}</span>
+          <span
+            className="trade-card__mgr-name"
+            title={trade.receivedTeamName}
+            aria-label={trade.receivedTeamName}
+          >
+            {portraitAbbrev
+              ? teamNameLastWord(trade.receivedTeamName)
+              : trade.receivedTeamName}
+          </span>
         </div>
       </div>
       <div className="trade-pairs-grid">
