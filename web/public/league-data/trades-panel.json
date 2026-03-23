@@ -1,6 +1,6 @@
 {
-  "generated": "2026-03-21T02:28:02.972Z",
-  "lastGwUsed": 30,
+  "generated": "2026-03-23T21:04:57.893Z",
+  "lastGwUsed": 31,
   "note": "Per player acquired in a processed trade (state p): FPL pts from trade.event through first drop by that manager, or last finished GW. GW range like 9–28 = inclusive gameweeks on that squad.",
   "trades": [
     {
@@ -23,10 +23,10 @@
           "gainedElementId": 661,
           "gaveElementId": 499,
           "startGw": 9,
-          "endGw": 30,
+          "endGw": 31,
           "totalPoints": 73,
           "stillOnTeam": true,
-          "gwRangeLabel": "9–30"
+          "gwRangeLabel": "9–31"
         },
         {
           "side": "received",
@@ -36,10 +36,10 @@
           "gainedElementId": 499,
           "gaveElementId": 661,
           "startGw": 9,
-          "endGw": 30,
+          "endGw": 31,
           "totalPoints": 19,
           "stillOnTeam": true,
-          "gwRangeLabel": "9–30"
+          "gwRangeLabel": "9–31"
         }
       ],
       "pairs": [
@@ -52,10 +52,10 @@
             "gainedElementId": 661,
             "gaveElementId": 499,
             "startGw": 9,
-            "endGw": 30,
+            "endGw": 31,
             "totalPoints": 73,
             "stillOnTeam": true,
-            "gwRangeLabel": "9–30"
+            "gwRangeLabel": "9–31"
           },
           "receivedLeg": {
             "side": "received",
@@ -65,10 +65,10 @@
             "gainedElementId": 499,
             "gaveElementId": 661,
             "startGw": 9,
-            "endGw": 30,
+            "endGw": 31,
             "totalPoints": 19,
             "stillOnTeam": true,
-            "gwRangeLabel": "9–30"
+            "gwRangeLabel": "9–31"
           }
         }
       ],
@@ -107,10 +107,10 @@
           "gainedElementId": 728,
           "gaveElementId": 101,
           "startGw": 13,
-          "endGw": 30,
+          "endGw": 31,
           "totalPoints": 72,
           "stillOnTeam": true,
-          "gwRangeLabel": "13–30"
+          "gwRangeLabel": "13–31"
         },
         {
           "side": "offered",
@@ -120,10 +120,10 @@
           "gainedElementId": 64,
           "gaveElementId": 97,
           "startGw": 13,
-          "endGw": 30,
-          "totalPoints": 71,
+          "endGw": 31,
+          "totalPoints": 80,
           "stillOnTeam": true,
-          "gwRangeLabel": "13–30"
+          "gwRangeLabel": "13–31"
         },
         {
           "side": "received",
@@ -133,10 +133,10 @@
           "gainedElementId": 97,
           "gaveElementId": 64,
           "startGw": 13,
-          "endGw": 30,
-          "totalPoints": 59,
+          "endGw": 31,
+          "totalPoints": 64,
           "stillOnTeam": true,
-          "gwRangeLabel": "13–30"
+          "gwRangeLabel": "13–31"
         }
       ],
       "pairs": [
@@ -162,10 +162,10 @@
             "gainedElementId": 728,
             "gaveElementId": 101,
             "startGw": 13,
-            "endGw": 30,
+            "endGw": 31,
             "totalPoints": 72,
             "stillOnTeam": true,
-            "gwRangeLabel": "13–30"
+            "gwRangeLabel": "13–31"
           }
         },
         {
@@ -177,10 +177,10 @@
             "gainedElementId": 64,
             "gaveElementId": 97,
             "startGw": 13,
-            "endGw": 30,
-            "totalPoints": 71,
+            "endGw": 31,
+            "totalPoints": 80,
             "stillOnTeam": true,
-            "gwRangeLabel": "13–30"
+            "gwRangeLabel": "13–31"
           },
           "receivedLeg": {
             "side": "received",
@@ -190,10 +190,10 @@
             "gainedElementId": 97,
             "gaveElementId": 64,
             "startGw": 13,
-            "endGw": 30,
-            "totalPoints": 59,
+            "endGw": 31,
+            "totalPoints": 64,
             "stillOnTeam": true,
-            "gwRangeLabel": "13–30"
+            "gwRangeLabel": "13–31"
           }
         }
       ],
@@ -219,10 +219,10 @@
           "gainedElementId": 260,
           "gaveElementId": 371,
           "startGw": 23,
-          "endGw": 30,
+          "endGw": 31,
           "totalPoints": 30,
           "stillOnTeam": true,
-          "gwRangeLabel": "23–30"
+          "gwRangeLabel": "23–31"
         },
         {
           "side": "received",
@@ -232,10 +232,10 @@
           "gainedElementId": 371,
           "gaveElementId": 260,
           "startGw": 23,
-          "endGw": 30,
-          "totalPoints": 19,
+          "endGw": 31,
+          "totalPoints": 26,
           "stillOnTeam": true,
-          "gwRangeLabel": "23–30"
+          "gwRangeLabel": "23–31"
         }
       ],
       "pairs": [
@@ -248,10 +248,10 @@
             "gainedElementId": 260,
             "gaveElementId": 371,
             "startGw": 23,
-            "endGw": 30,
+            "endGw": 31,
             "totalPoints": 30,
             "stillOnTeam": true,
-            "gwRangeLabel": "23–30"
+            "gwRangeLabel": "23–31"
           },
           "receivedLeg": {
             "side": "received",
@@ -261,10 +261,10 @@
             "gainedElementId": 371,
             "gaveElementId": 260,
             "startGw": 23,
-            "endGw": 30,
-            "totalPoints": 19,
+            "endGw": 31,
+            "totalPoints": 26,
             "stillOnTeam": true,
-            "gwRangeLabel": "23–30"
+            "gwRangeLabel": "23–31"
           }
         }
       ],
@@ -290,10 +290,10 @@
           "gainedElementId": 440,
           "gaveElementId": 8,
           "startGw": 27,
-          "endGw": 30,
-          "totalPoints": 11,
+          "endGw": 31,
+          "totalPoints": 12,
           "stillOnTeam": true,
-          "gwRangeLabel": "27–30"
+          "gwRangeLabel": "27–31"
         },
         {
           "side": "received",
@@ -303,10 +303,10 @@
           "gainedElementId": 8,
           "gaveElementId": 440,
           "startGw": 27,
-          "endGw": 30,
+          "endGw": 31,
           "totalPoints": 25,
           "stillOnTeam": true,
-          "gwRangeLabel": "27–30"
+          "gwRangeLabel": "27–31"
         },
         {
           "side": "offered",
@@ -316,10 +316,10 @@
           "gainedElementId": 691,
           "gaveElementId": 526,
           "startGw": 27,
-          "endGw": 30,
-          "totalPoints": 6,
+          "endGw": 31,
+          "totalPoints": 8,
           "stillOnTeam": true,
-          "gwRangeLabel": "27–30"
+          "gwRangeLabel": "27–31"
         },
         {
           "side": "received",
@@ -329,10 +329,10 @@
           "gainedElementId": 526,
           "gaveElementId": 691,
           "startGw": 27,
-          "endGw": 30,
-          "totalPoints": 14,
+          "endGw": 31,
+          "totalPoints": 22,
           "stillOnTeam": true,
-          "gwRangeLabel": "27–30"
+          "gwRangeLabel": "27–31"
         }
       ],
       "pairs": [
@@ -345,10 +345,10 @@
             "gainedElementId": 440,
             "gaveElementId": 8,
             "startGw": 27,
-            "endGw": 30,
-            "totalPoints": 11,
+            "endGw": 31,
+            "totalPoints": 12,
             "stillOnTeam": true,
-            "gwRangeLabel": "27–30"
+            "gwRangeLabel": "27–31"
           },
           "receivedLeg": {
             "side": "received",
@@ -358,10 +358,10 @@
             "gainedElementId": 8,
             "gaveElementId": 440,
             "startGw": 27,
-            "endGw": 30,
+            "endGw": 31,
             "totalPoints": 25,
             "stillOnTeam": true,
-            "gwRangeLabel": "27–30"
+            "gwRangeLabel": "27–31"
           }
         },
         {
@@ -373,10 +373,10 @@
             "gainedElementId": 691,
             "gaveElementId": 526,
             "startGw": 27,
-            "endGw": 30,
-            "totalPoints": 6,
+            "endGw": 31,
+            "totalPoints": 8,
             "stillOnTeam": true,
-            "gwRangeLabel": "27–30"
+            "gwRangeLabel": "27–31"
           },
           "receivedLeg": {
             "side": "received",
@@ -386,10 +386,10 @@
             "gainedElementId": 526,
             "gaveElementId": 691,
             "startGw": 27,
-            "endGw": 30,
-            "totalPoints": 14,
+            "endGw": 31,
+            "totalPoints": 22,
             "stillOnTeam": true,
-            "gwRangeLabel": "27–30"
+            "gwRangeLabel": "27–31"
           }
         }
       ],

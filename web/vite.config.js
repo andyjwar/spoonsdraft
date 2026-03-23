@@ -6,6 +6,8 @@ export default defineConfig({
   base: process.env.VITE_BASE_PATH || '/TCLOT/',
   plugins: [react()],
   server: {
+    // App lives under base `/TCLOT/` — open `http://localhost:5173/TCLOT/` (root URL alone is empty).
+    open: '/TCLOT/',
     // Live tab: same-origin `/__fpl/*` when `npm run dev` and VITE_FPL_PROXY_URL is unset
     // (avoids CORS + works without redeploying the Cloudflare worker).
     proxy: {

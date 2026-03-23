@@ -1,5 +1,5 @@
 {
-  "generated": "2026-03-21T02:28:02.959Z",
+  "generated": "2026-03-23T21:04:57.886Z",
   "note": "Successful waiver (transactionKind w) and free-agency (f) swaps. droppedPlayerGwPoints / pickedUpPlayerGwPoints = FPL pts that GW for element_out / element_in (event/live)",
   "rows": [
     {
@@ -9,8 +9,8 @@
       "element_in": 735,
       "element_out": 100,
       "added": "2026-03-20T12:38:07.841036Z",
-      "droppedPlayerGwPoints": null,
-      "pickedUpPlayerGwPoints": null,
+      "droppedPlayerGwPoints": 5,
+      "pickedUpPlayerGwPoints": 1,
       "transactionKind": "f"
     },
     {
@@ -20,8 +20,8 @@
       "element_in": 443,
       "element_out": 226,
       "added": "2026-03-20T12:33:36.383435Z",
-      "droppedPlayerGwPoints": null,
-      "pickedUpPlayerGwPoints": null,
+      "droppedPlayerGwPoints": 0,
+      "pickedUpPlayerGwPoints": 3,
       "transactionKind": "f"
     },
     {
@@ -31,8 +31,8 @@
       "element_in": 568,
       "element_out": 402,
       "added": "2026-03-19T22:06:13.847454Z",
-      "droppedPlayerGwPoints": null,
-      "pickedUpPlayerGwPoints": null,
+      "droppedPlayerGwPoints": 0,
+      "pickedUpPlayerGwPoints": 1,
       "transactionKind": "f"
     },
     {
@@ -42,8 +42,8 @@
       "element_in": 139,
       "element_out": 502,
       "added": "2026-03-19T19:16:58.031997Z",
-      "droppedPlayerGwPoints": null,
-      "pickedUpPlayerGwPoints": null,
+      "droppedPlayerGwPoints": 7,
+      "pickedUpPlayerGwPoints": 3,
       "transactionKind": "f"
     },
     {
@@ -53,8 +53,8 @@
       "element_in": 106,
       "element_out": 290,
       "added": "2026-03-19T19:09:15.876633Z",
-      "droppedPlayerGwPoints": null,
-      "pickedUpPlayerGwPoints": null,
+      "droppedPlayerGwPoints": 1,
+      "pickedUpPlayerGwPoints": 6,
       "transactionKind": "f"
     },
     {
@@ -64,8 +64,8 @@
       "element_in": 603,
       "element_out": 531,
       "added": "2026-03-19T19:08:39.357667Z",
-      "droppedPlayerGwPoints": null,
-      "pickedUpPlayerGwPoints": null,
+      "droppedPlayerGwPoints": 0,
+      "pickedUpPlayerGwPoints": 1,
       "transactionKind": "f"
     },
     {
@@ -75,8 +75,8 @@
       "element_in": 593,
       "element_out": 646,
       "added": "2026-03-19T18:52:50.228111Z",
-      "droppedPlayerGwPoints": null,
-      "pickedUpPlayerGwPoints": null,
+      "droppedPlayerGwPoints": 0,
+      "pickedUpPlayerGwPoints": 2,
       "transactionKind": "f"
     },
     {
@@ -86,8 +86,8 @@
       "element_in": 354,
       "element_out": 169,
       "added": "2026-03-19T18:45:38.794441Z",
-      "droppedPlayerGwPoints": null,
-      "pickedUpPlayerGwPoints": null,
+      "droppedPlayerGwPoints": 6,
+      "pickedUpPlayerGwPoints": 5,
       "transactionKind": "f"
     },
     {
@@ -97,8 +97,8 @@
       "element_in": 681,
       "element_out": 813,
       "added": "2026-03-19T18:27:20.330934Z",
-      "droppedPlayerGwPoints": null,
-      "pickedUpPlayerGwPoints": null,
+      "droppedPlayerGwPoints": 3,
+      "pickedUpPlayerGwPoints": 2,
       "transactionKind": "w"
     },
     {
@@ -108,8 +108,8 @@
       "element_in": 792,
       "element_out": 806,
       "added": "2026-03-19T18:27:20.330906Z",
-      "droppedPlayerGwPoints": null,
-      "pickedUpPlayerGwPoints": null,
+      "droppedPlayerGwPoints": 1,
+      "pickedUpPlayerGwPoints": 1,
       "transactionKind": "w"
     },
     {
@@ -119,8 +119,8 @@
       "element_in": 215,
       "element_out": 283,
       "added": "2026-03-19T18:27:20.330862Z",
-      "droppedPlayerGwPoints": null,
-      "pickedUpPlayerGwPoints": null,
+      "droppedPlayerGwPoints": 0,
+      "pickedUpPlayerGwPoints": 7,
       "transactionKind": "w"
     },
     {
@@ -130,8 +130,8 @@
       "element_in": 343,
       "element_out": 342,
       "added": "2026-03-19T18:27:20.330832Z",
-      "droppedPlayerGwPoints": null,
-      "pickedUpPlayerGwPoints": null,
+      "droppedPlayerGwPoints": 5,
+      "pickedUpPlayerGwPoints": 5,
       "transactionKind": "w"
     },
     {
@@ -141,8 +141,8 @@
       "element_in": 646,
       "element_out": 808,
       "added": "2026-03-19T18:27:20.330770Z",
-      "droppedPlayerGwPoints": null,
-      "pickedUpPlayerGwPoints": null,
+      "droppedPlayerGwPoints": 2,
+      "pickedUpPlayerGwPoints": 0,
       "transactionKind": "w"
     },
     {
@@ -152,8 +152,8 @@
       "element_in": 450,
       "element_out": 200,
       "added": "2026-03-19T18:27:20.330711Z",
-      "droppedPlayerGwPoints": null,
-      "pickedUpPlayerGwPoints": null,
+      "droppedPlayerGwPoints": 2,
+      "pickedUpPlayerGwPoints": 6,
       "transactionKind": "w"
     },
     {
@@ -163,8 +163,8 @@
       "element_in": 565,
       "element_out": 469,
       "added": "2026-03-19T15:47:56.283177Z",
-      "droppedPlayerGwPoints": null,
-      "pickedUpPlayerGwPoints": null,
+      "droppedPlayerGwPoints": 0,
+      "pickedUpPlayerGwPoints": 2,
       "transactionKind": "w"
     },
     {
@@ -174,8 +174,8 @@
       "element_in": 224,
       "element_out": 225,
       "added": "2026-03-19T15:47:56.283084Z",
-      "droppedPlayerGwPoints": null,
-      "pickedUpPlayerGwPoints": null,
+      "droppedPlayerGwPoints": 0,
+      "pickedUpPlayerGwPoints": 1,
       "transactionKind": "w"
     },
     {
@@ -185,8 +185,8 @@
       "element_in": 146,
       "element_out": 714,
       "added": "2026-03-17T20:34:45.670230Z",
-      "droppedPlayerGwPoints": null,
-      "pickedUpPlayerGwPoints": null,
+      "droppedPlayerGwPoints": 0,
+      "pickedUpPlayerGwPoints": 1,
       "transactionKind": "w"
     },
     {
@@ -196,8 +196,8 @@
       "element_in": 148,
       "element_out": 408,
       "added": "2026-03-17T20:34:45.670186Z",
-      "droppedPlayerGwPoints": null,
-      "pickedUpPlayerGwPoints": null,
+      "droppedPlayerGwPoints": 0,
+      "pickedUpPlayerGwPoints": 2,
       "transactionKind": "w"
     },
     {
@@ -207,8 +207,8 @@
       "element_in": 591,
       "element_out": 26,
       "added": "2026-03-17T20:34:45.670155Z",
-      "droppedPlayerGwPoints": null,
-      "pickedUpPlayerGwPoints": null,
+      "droppedPlayerGwPoints": 0,
+      "pickedUpPlayerGwPoints": 2,
       "transactionKind": "w"
     },
     {
@@ -218,8 +218,8 @@
       "element_in": 7,
       "element_out": 36,
       "added": "2026-03-16T07:46:44.833277Z",
-      "droppedPlayerGwPoints": null,
-      "pickedUpPlayerGwPoints": null,
+      "droppedPlayerGwPoints": 6,
+      "pickedUpPlayerGwPoints": 0,
       "transactionKind": "w"
     },
     {
@@ -229,8 +229,8 @@
       "element_in": 476,
       "element_out": 258,
       "added": "2026-03-15T17:12:06.039791Z",
-      "droppedPlayerGwPoints": null,
-      "pickedUpPlayerGwPoints": null,
+      "droppedPlayerGwPoints": 0,
+      "pickedUpPlayerGwPoints": 3,
       "transactionKind": "w"
     },
     {
@@ -240,8 +240,8 @@
       "element_in": 505,
       "element_out": 261,
       "added": "2026-03-15T15:43:31.732129Z",
-      "droppedPlayerGwPoints": null,
-      "pickedUpPlayerGwPoints": null,
+      "droppedPlayerGwPoints": 0,
+      "pickedUpPlayerGwPoints": 9,
       "transactionKind": "w"
     },
     {
@@ -251,8 +251,8 @@
       "element_in": 299,
       "element_out": 547,
       "added": "2026-03-15T15:43:31.732109Z",
-      "droppedPlayerGwPoints": null,
-      "pickedUpPlayerGwPoints": null,
+      "droppedPlayerGwPoints": 1,
+      "pickedUpPlayerGwPoints": 10,
       "transactionKind": "w"
     },
     {
@@ -262,8 +262,8 @@
       "element_in": 673,
       "element_out": 628,
       "added": "2026-03-15T13:11:36.517210Z",
-      "droppedPlayerGwPoints": null,
-      "pickedUpPlayerGwPoints": null,
+      "droppedPlayerGwPoints": 0,
+      "pickedUpPlayerGwPoints": 2,
       "transactionKind": "w"
     },
     {
@@ -273,8 +273,8 @@
       "element_in": 477,
       "element_out": 256,
       "added": "2026-03-15T13:11:36.517168Z",
-      "droppedPlayerGwPoints": null,
-      "pickedUpPlayerGwPoints": null,
+      "droppedPlayerGwPoints": 0,
+      "pickedUpPlayerGwPoints": 1,
       "transactionKind": "w"
     },
     {

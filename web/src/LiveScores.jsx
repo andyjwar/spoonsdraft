@@ -647,20 +647,10 @@ export function LiveScores({
 
   const useFixtureLayout = gwMatches.length > 0;
 
-  const metaLine = eventSnapshot
-    ? [
-        eventSnapshot.finished ? 'Finished' : 'In progress / upcoming',
-        eventSnapshot.is_current ? '· FPL current GW' : '',
-        eventSnapshot.is_next ? '· FPL next GW' : '',
-      ]
-        .filter(Boolean)
-        .join(' ')
-    : '';
-
   return (
     <div className="dashboard-stack live-scores-root">
       <section className="tile tile--compact" aria-labelledby="live-heading">
-        <h2 id="live-heading" className="tile-title live-scores-main-title">
+        <h2 id="live-heading" className="tile-title tile-title--sm">
           Live scores
         </h2>
 
@@ -698,7 +688,6 @@ export function LiveScores({
 
         <div className="live-toolbar">
           <label className="live-gw-label">
-            <span className="live-gw-field-label">Gameweek</span>
             <select
               className="live-gw-select"
               aria-label="Gameweek"
@@ -710,7 +699,6 @@ export function LiveScores({
                   <option key={o.id} value={o.id}>
                     {o.label}
                     {o.finished ? ' ✓' : ''}
-                    {o.is_current ? ' (current)' : ''}
                   </option>
                 ))
               ) : (
@@ -727,8 +715,6 @@ export function LiveScores({
             {loading ? 'Loading…' : 'Refresh from FPL'}
           </button>
         </div>
-
-        {metaLine ? <p className="muted live-meta">{metaLine}</p> : null}
 
         {error ? (
           <div className="data-banner data-banner--error" role="alert">

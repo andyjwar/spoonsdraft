@@ -3,6 +3,8 @@ import { TEAM_KIT_COUNT } from './teamKitStyles';
 
 const DATA_BASE = `${import.meta.env.BASE_URL}league-data`;
 const FORM_LAST_N = 7;
+/** Team form tile: last N finished H2Hs (standings form column still uses FORM_LAST_N). */
+const FORM_STRIP_N = 8;
 
 async function fetchJSON(path) {
   const url = `${DATA_BASE}/${path}`;
@@ -566,7 +568,7 @@ function processLeagueData(raw, extras = {}) {
           m.league_entry_1 === entryId || m.league_entry_2 === entryId
       )
       .sort((a, b) => a.event - b.event || (a.id ?? 0) - (b.id ?? 0))
-      .slice(-FORM_LAST_N);
+      .slice(-FORM_STRIP_N);
     return mine.map((m) => {
       const oppId = opponentId(m, entryId);
       const myPts =
@@ -869,4 +871,4 @@ function processLeagueData(raw, extras = {}) {
   };
 }
 
-export { FORM_LAST_N };
+export { FORM_LAST_N, FORM_STRIP_N };
