@@ -21,6 +21,10 @@ import {
 import { TeamAvatar } from './TeamAvatar'
 import { LiveScores } from './LiveScores'
 import { PlayOffBracket } from './PlayOffBracket'
+import {
+  computeHallManagerCareerRows,
+  computeLiveHallManagerCareerRows,
+} from './hallManagerHistory'
 import './App.css'
 
 /** Sorted ascending unique GWs from schedule rows (1–38). */
@@ -107,71 +111,283 @@ const HALL_OF_CHAMPIONS = [
   },
 ]
 
-function HallOfChampions({ logoMap, kitIndexByEntry = {} }) {
+/** Sortable career-totals header (Hall of Champions manager table). */
+function HallManagerSortTh({ columnKey, sortState, onSort, label, title, className, stringSort = false }) {
+  const active = sortState.key === columnKey
+  const dir = active ? sortState.dir : null
+  let arrowGlyph = '↕'
+  let arrowClass = 'standings-sort-arrow'
+  if (active) {
+    arrowGlyph = dir === 'asc' ? '↑' : '↓'
+    arrowClass += ` standings-sort-arrow--active standings-sort-arrow--${dir}`
+  }
+  const ariaSort = active ? (dir === 'asc' ? 'ascending' : 'descending') : undefined
+  const ariaLabel = active
+    ? stringSort
+      ? `${label}: sorted ${dir === 'asc' ? 'A to Z' : 'Z to A'}. Click to reverse.`
+      : `${label}: sorted ${dir === 'desc' ? 'high to low' : 'low to high'}. Click to reverse.`
+    : `Sort by ${label}`
+
+  return (
+    <th scope="col" className={className} title={title}>
+      <button
+        type="button"
+        className="standings-sort-btn hall-manager-sort-btn"
+        onClick={() => onSort(columnKey)}
+        aria-sort={ariaSort}
+        aria-label={ariaLabel}
+      >
+        <span className="standings-sort-btn__label">{label}</span>
+        <span className={arrowClass} aria-hidden>
+          {arrowGlyph}
+        </span>
+      </button>
+    </th>
+  )
+}
+
+function HallManagerCareerTable({ title, headingId, explanation, careerRows }) {
+  const [sort, setSort] = useState({ key: 'totalPts', dir: 'desc' })
+
+  const handleSort = useCallback((columnKey) => {
+    setSort((prev) => {
+      if (prev.key === columnKey) {
+        return { key: columnKey, dir: prev.dir === 'asc' ? 'desc' : 'asc' }
+      }
+      const defaultDir = columnKey === 'key' ? 'asc' : 'desc'
+      return { key: columnKey, dir: defaultDir }
+    })
+  }, [])
+
+  const sortedRows = useMemo(() => {
+    const { key: sk, dir } = sort
+    const mult = dir === 'asc' ? 1 : -1
+    const out = [...careerRows]
+    out.sort((a, b) => {
+      switch (sk) {
+        case 'key':
+          return mult * a.key.localeCompare(b.key, undefined, { sensitivity: 'base' })
+        case 'seasons':
+          return mult * (a.seasons - b.seasons)
+        case 'titles':
+          return mult * (a.titles - b.titles)
+        case 'lastPlaceCount':
+          return mult * (a.lastPlaceCount - b.lastPlaceCount)
+        case 'avgRank':
+          return mult * (a.avgRank - b.avgRank)
+        case 'totalPf':
+          return mult * (a.totalPf - b.totalPf)
+        case 'totalPts':
+          return mult * (a.totalPts - b.totalPts)
+        case 'totalPlacementPts':
+          return mult * (a.totalPlacementPts - b.totalPlacementPts)
+        default:
+          return 0
+      }
+    })
+    return out
+  }, [careerRows, sort])
+
   return (
     <section
-      className="tile hall-of-champions"
-      aria-labelledby="hall-champions-heading"
+      className="tile hall-of-champions hall-manager-dash"
+      aria-labelledby={headingId}
     >
-      <h2
-        id="hall-champions-heading"
-        className="tile-title tile-title--sm hall-of-champions__main-title"
-      >
-        TCLOT Hall of Champions
+      <h2 id={headingId} className="tile-title tile-title--sm hall-manager-dash__title">
+        {title}
       </h2>
-      <div className="hall-of-champions__rule" aria-hidden="true" />
-      <ul className="hall-of-champions__list">
-        {HALL_OF_CHAMPIONS.map((row) => (
-          <li key={row.season} className="hall-champion-banner">
-            <div className="hall-champion-banner__rigging" aria-hidden="true">
-              <div className="hall-champion-banner__rod" />
-              <div className="hall-champion-banner__cords">
-                <span className="hall-champion-banner__cord" />
-                <span className="hall-champion-banner__cord" />
-              </div>
-            </div>
-            <div
-              className={
-                'hall-champion-banner__sheet' +
-                (row.bannerImage
-                  ? ' hall-champion-banner__sheet--fullbleed'
-                  : '')
-              }
-            >
-              {row.bannerImage ? (
-                <img
-                  className="hall-champion-banner__fullbleed-img"
-                  src={`${import.meta.env.BASE_URL}${row.bannerImage}`}
-                  alt={`${row.team}, ${row.season} season champion`}
-                  loading="lazy"
-                  decoding="async"
-                />
-              ) : null}
-              <div className="hall-champion-banner__sheet-content">
-                <p className="hall-champion-banner__team">{row.team}</p>
-                {row.bannerImage ? (
-                  <div
-                    className="hall-champion-banner__sheet-spacer"
-                    aria-hidden="true"
-                  />
-                ) : (
-                  <div className="hall-champion-banner__avatar">
-                    <TeamAvatar
-                      entryId={row.entryId ?? null}
-                      name={row.team}
-                      size="lg"
-                      logoMap={logoMap ?? {}}
-                      kitIndexByEntry={kitIndexByEntry}
-                    />
-                  </div>
-                )}
-                <p className="hall-champion-banner__season">{row.season} season</p>
-              </div>
-            </div>
-          </li>
-        ))}
-      </ul>
+      {explanation ? (
+        <p className="hall-manager-dash__explanation muted">{explanation}</p>
+      ) : null}
+      <div className="table-scroll table-scroll--hall-manager">
+        <table className="hall-manager-table">
+          <thead>
+            <tr>
+              <HallManagerSortTh
+                columnKey="key"
+                sortState={sort}
+                onSort={handleSort}
+                label="Manager"
+                title="Manager"
+                className="hall-manager-th--name"
+                stringSort
+              />
+              <HallManagerSortTh
+                columnKey="seasons"
+                sortState={sort}
+                onSort={handleSort}
+                label="Seasons"
+                title="Seasons in TCLOT"
+                className="tabular hall-manager-th--num"
+              />
+              <HallManagerSortTh
+                columnKey="titles"
+                sortState={sort}
+                onSort={handleSort}
+                label="Titles"
+                title="League titles (finished 1st)"
+                className="tabular hall-manager-th--num"
+              />
+              <HallManagerSortTh
+                columnKey="lastPlaceCount"
+                sortState={sort}
+                onSort={handleSort}
+                label="Last"
+                title="Times finished last in the table that season"
+                className="tabular hall-manager-th--num"
+              />
+              <HallManagerSortTh
+                columnKey="avgRank"
+                sortState={sort}
+                onSort={handleSort}
+                label="Average Rank"
+                title="Mean finishing position (lower is better)"
+                className="tabular hall-manager-th--num"
+              />
+              <HallManagerSortTh
+                columnKey="totalPf"
+                sortState={sort}
+                onSort={handleSort}
+                label="For"
+                title="Total FPL points scored (sum of For across seasons)"
+                className="tabular hall-manager-th--num"
+              />
+              <HallManagerSortTh
+                columnKey="totalPts"
+                sortState={sort}
+                onSort={handleSort}
+                label="Total Pts"
+                title="Total H2H league points"
+                className="tabular hall-manager-th--num"
+              />
+              <HallManagerSortTh
+                columnKey="totalPlacementPts"
+                sortState={sort}
+                onSort={handleSort}
+                label="Algorithm"
+                title="Placement score: 8 for 1st, 7 for 2nd, … 1 for 8th each season"
+                className="tabular hall-manager-th--num"
+              />
+            </tr>
+          </thead>
+          <tbody>
+            {sortedRows.map((r) => (
+              <tr key={r.key}>
+                <th scope="row" className="hall-manager-table__name hall-manager-name--gold">
+                  {r.key}
+                </th>
+                <td className="tabular">{r.seasons}</td>
+                <td className="tabular">{r.titles}</td>
+                <td className="tabular">{r.lastPlaceCount}</td>
+                <td className="tabular">{r.avgRank.toFixed(2)}</td>
+                <td className="tabular">{r.totalPf}</td>
+                <td className="tabular">
+                  <strong>{r.totalPts}</strong>
+                </td>
+                <td className="tabular">
+                  <strong>{r.totalPlacementPts}</strong>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </section>
+  )
+}
+
+function HallManagerCareerDashboard({ tableRows = [] }) {
+  const staticRows = useMemo(() => computeHallManagerCareerRows(), [])
+  const liveRows = useMemo(
+    () => computeLiveHallManagerCareerRows(tableRows),
+    [tableRows],
+  )
+
+  return (
+    <>
+      <HallManagerCareerTable
+        headingId="hall-champions-static-heading"
+        title="TCLOT Champion of Champions"
+        careerRows={staticRows}
+      />
+      <HallManagerCareerTable
+        headingId="hall-champions-live-heading"
+        title="Live Champions of Champions"
+        explanation="Includes 2025/26 season standings."
+        careerRows={liveRows}
+      />
+    </>
+  )
+}
+
+function HallOfChampions({ logoMap, kitIndexByEntry = {}, tableRows = [] }) {
+  return (
+    <>
+      <section
+        className="tile hall-of-champions"
+        aria-labelledby="hall-champions-heading"
+      >
+        <h2
+          id="hall-champions-heading"
+          className="tile-title tile-title--sm hall-of-champions__main-title"
+        >
+          TCLOT Hall of Champions
+        </h2>
+        <div className="hall-of-champions__rule" aria-hidden="true" />
+        <ul className="hall-of-champions__list">
+          {HALL_OF_CHAMPIONS.map((row) => (
+            <li key={row.season} className="hall-champion-banner">
+              <div className="hall-champion-banner__rigging" aria-hidden="true">
+                <div className="hall-champion-banner__rod" />
+                <div className="hall-champion-banner__cords">
+                  <span className="hall-champion-banner__cord" />
+                  <span className="hall-champion-banner__cord" />
+                </div>
+              </div>
+              <div
+                className={
+                  'hall-champion-banner__sheet' +
+                  (row.bannerImage
+                    ? ' hall-champion-banner__sheet--fullbleed'
+                    : '')
+                }
+              >
+                {row.bannerImage ? (
+                  <img
+                    className="hall-champion-banner__fullbleed-img"
+                    src={`${import.meta.env.BASE_URL}${row.bannerImage}`}
+                    alt={`${row.team}, ${row.season} season champion`}
+                    loading="lazy"
+                    decoding="async"
+                  />
+                ) : null}
+                <div className="hall-champion-banner__sheet-content">
+                  <p className="hall-champion-banner__team">{row.team}</p>
+                  {row.bannerImage ? (
+                    <div
+                      className="hall-champion-banner__sheet-spacer"
+                      aria-hidden="true"
+                    />
+                  ) : (
+                    <div className="hall-champion-banner__avatar">
+                      <TeamAvatar
+                        entryId={row.entryId ?? null}
+                        name={row.team}
+                        size="lg"
+                        logoMap={logoMap ?? {}}
+                        kitIndexByEntry={kitIndexByEntry}
+                      />
+                    </div>
+                  )}
+                  <p className="hall-champion-banner__season">{row.season} season</p>
+                </div>
+              </div>
+            </li>
+          ))}
+        </ul>
+      </section>
+      <HallManagerCareerDashboard tableRows={tableRows} />
+    </>
   )
 }
 
@@ -1581,7 +1797,11 @@ function App() {
           ) : null}
 
           {showDashboardHall && dashboardView === 'hall' ? (
-            <HallOfChampions logoMap={teamLogoMap} kitIndexByEntry={kitIndexByEntry} />
+            <HallOfChampions
+              logoMap={teamLogoMap}
+              kitIndexByEntry={kitIndexByEntry}
+              tableRows={tableRows}
+            />
           ) : null}
 
           {dashboardView === 'waivers' && (

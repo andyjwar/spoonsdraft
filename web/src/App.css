@@ -3357,6 +3357,109 @@ button.live-fixture-banner--toggle {
   text-align: center;
 }
 
+/* Hall — manager career stats (final tables by season) */
+.hall-manager-dash {
+  margin-top: 0;
+}
+
+.hall-manager-dash__title {
+  margin: 0 0 12px;
+  color: var(--hall-gold);
+  text-align: center;
+}
+
+.hall-manager-dash__explanation {
+  margin: 0 0 14px;
+  font-size: 0.8rem;
+  line-height: 1.45;
+  text-align: center;
+  max-width: 40rem;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.table-scroll--hall-manager {
+  margin-top: 0;
+  border-radius: 10px;
+  border: 1px solid var(--hall-rule);
+  background: color-mix(in srgb, var(--hall-bg) 94%, #000 6%);
+}
+
+.hall-manager-table {
+  width: 100%;
+  min-width: 34rem;
+  border-collapse: collapse;
+  font-size: 0.8rem;
+}
+
+.hall-manager-table th,
+.hall-manager-table td {
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--hall-rule);
+  vertical-align: middle;
+}
+
+.hall-manager-table thead th {
+  font-size: 0.62rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--hall-muted);
+  background: color-mix(in srgb, var(--hall-bg) 88%, var(--hall-gold) 6%);
+}
+
+.hall-manager-table tbody tr:last-child th,
+.hall-manager-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.hall-manager-table tbody th.hall-manager-table__name {
+  font-weight: 700;
+}
+
+/* Gold / yellow manager names (Hall career table) */
+.hall-manager-name--gold {
+  color: var(--hall-gold);
+}
+
+.hall-manager-table .hall-manager-sort-btn {
+  width: 100%;
+  font: inherit;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: none;
+  color: inherit;
+}
+
+.hall-manager-table thead th .standings-sort-btn__label {
+  text-transform: none;
+  letter-spacing: 0.02em;
+  font-size: 0.72rem;
+}
+
+.hall-manager-th--name .hall-manager-sort-btn {
+  text-align: left;
+  justify-items: start;
+}
+
+.hall-manager-th--name .standings-sort-btn__label {
+  text-align: left;
+}
+
+.hall-manager-th--num .standings-sort-btn__label {
+  text-align: right;
+}
+
+.hall-manager-table td.tabular,
+.hall-manager-table thead th.tabular {
+  text-align: right;
+}
+
+.hall-manager-table thead th.hall-manager-th--name {
+  text-align: left;
+}
+
 .hall-of-champions__rule {
   height: 1px;
   margin: 0 auto 22px;
