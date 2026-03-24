@@ -37,26 +37,31 @@ function displayEntryName(e) {
 function normalizeStaticPicks(raw, leagueEntries) {
   const list = raw?.picks
   if (!Array.isArray(list) || !list.length) return null
-  const nameByFpl = new Map(
-    (leagueEntries || []).map((e) => [e.entry_id, displayEntryName(e)]),
-  )
-  const leagueIdByFpl = new Map(
-    (leagueEntries || [])
-      .filter((e) => e?.entry_id != null && e?.id != null)
-      .map((e) => [e.entry_id, e.id]),
-  )
-  return list.map((p) => ({
+  const nameByFpl = new Map()
+  const leagueIdByFpl = new Map()
+  for (const e of leagueEntries || []) {
+    if (e?.entry_id == null) continue
+    const fid = Number(e.entry_id)
+    if (!Number.isFinite(fid)) continue
+    nameByFpl.set(fid, displayEntryName(e))
+    if (e?.id != null) leagueIdByFpl.set(fid, e.id)
+  }
+  return list.map((p) => {
+    const fidPick = Number(p.entryId)
+    const entryId = Number.isFinite(fidPick) ? fidPick : p.entryId
+    return {
     overallPick: p.overallPick,
     round: p.round,
     pickInRound: p.pickInRound,
-    entryId: p.entryId,
-    leagueEntryId: p.leagueEntryId ?? leagueIdByFpl.get(p.entryId) ?? null,
-    teamName: p.teamName || nameByFpl.get(p.entryId) || '—',
+    entryId,
+    leagueEntryId: p.leagueEntryId ?? leagueIdByFpl.get(entryId) ?? null,
+    teamName: nameByFpl.get(entryId) || p.teamName || '—',
     element: p.element,
     playerName: p.playerName ?? `Player #${p.element}`,
     teamShort: p.teamShort ?? '—',
     pos: p.pos ?? '—',
-  }))
+  }
+  })
 }
 
 /**
@@ -67,14 +72,20 @@ function staticDraftPicksMatchLeague(raw, normalizedPicks, league, leagueEntries
   if (!normalizedPicks?.length) return false
   const metaId = raw?._meta?.leagueId
   const currentId = league?.id
-  if (metaId != null && currentId != null && Number(metaId) !== Number(currentId)) {
-    return false
+  // Forked TCLOT draft_picks.json always has _meta.leagueId (6802). Reject unless details match.
+  if (metaId != null) {
+    if (currentId == null || Number(metaId) !== Number(currentId)) {
+      return false
+    }
   }
   const entryIds = new Set(
-    (leagueEntries || []).map((e) => e.entry_id).filter((x) => x != null),
+    (leagueEntries || [])
+      .map((e) => e.entry_id)
+      .filter((x) => x != null)
+      .map((x) => Number(x)),
   )
   if (!entryIds.size) return false
-  return normalizedPicks.every((p) => entryIds.has(p.entryId))
+  return normalizedPicks.every((p) => entryIds.has(Number(p.entryId)))
 }
 
 function enrichPicksFromBootstrap(boot, picks) {

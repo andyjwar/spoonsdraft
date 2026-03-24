@@ -82,6 +82,11 @@ jobs:
             echo "::warning::VITE_FPL_PROXY_URL empty — add Repository secret (or Variable) named exactly VITE_FPL_PROXY_URL, or an Environment secret on github-pages, then re-run this workflow."
           fi
           echo "VITE_SHOW_DASHBOARD_TRADES=${VITE_SHOW_DASHBOARD_TRADES:-default on} VITE_SHOW_DASHBOARD_HALL=${VITE_SHOW_DASHBOARD_HALL:-default on}"
+          if [ -z "${FPL_LEAGUE_ID:-}" ]; then
+            echo "::notice::FPL_LEAGUE_ID not set for this build — build-draft-picks skipped; committed draft_picks.json is copied to dist. Set Repository or github-pages Environment Actions secret (or Variable) FPL_LEAGUE_ID to your draft league number so CI regenerates draft picks for this repo."
+          else
+            echo "FPL_LEAGUE_ID is set — build-draft-picks will run during npm run build"
+          fi
           npm ci
           npm run build
       - name: Verify league data shipped
